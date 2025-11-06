@@ -118,126 +118,1126 @@
     // =======================================================================
     // ИСХОДНЫЕ ДАННЫЕ С ФОТОГРАФИЯМИ
     // =======================================================================
-    const initialData = {
-        recipes: {
-            'oreo': {
-                name: 'Орео',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/oreo.jpg',
-                allIngredients: { 'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 'milk': { name: 'Молоко 3,2%', size500: '140', size650: '180' }, 'assam-tea': { name: 'Чай Ассам заготовка', size500: '50', size650: '75' }, 'condensed-milk': { name: 'Сгущеное молоко', size500: '25', size650: '30' }, 'cocoa-prep': { name: 'Какао заготовка', size500: '25', size650: '30' }, 'cane-syrup': { name: 'Тростниковый сироп', size500: '5', size650: '5' }, 'cheese-foam': { name: 'Сырная пенка', size500: '70', size650: '70' }, 'ice': { name: 'Лед', size500: '120', size650: '150' }, 'oreo-crumbs': { name: 'Крошка печенья Орео', size500: '', size650: '' } },
-                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['assam-tea', 'milk', 'condensed-milk', 'cocoa-prep'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca', 'ice', 'cane-syrup'] }, { description: 'Перелить содержимое шейкера в стакан.', ingredientKeys: [] }, { description: 'Украсить:', ingredientKeys: ['cheese-foam', 'oreo-crumbs'] } ]
+const initialData = {
+    "recipes": {
+        "oreo": {
+            "name": "Орео",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/oreo.jpg",
+            "allIngredients": {
+                "assam-tea": {
+                    "name": "Чай Ассам заготовка",
+                    "size500": "50",
+                    "size650": "75"
+                },
+                "milk": {
+                    "name": "Молоко 3,2%",
+                    "size500": "140",
+                    "size650": "180"
+                },
+                "condensed-milk": {
+                    "name": "Сгущёное молоко",
+                    "size500": "25",
+                    "size650": "30"
+                },
+                "cocoa-prep": {
+                    "name": "Какао заготовка",
+                    "size500": "25",
+                    "size650": "30"
+                },
+                "tapioca": {
+                    "name": "Тапиока",
+                    "size500": "80",
+                    "size650": "100"
+                },
+                "ice": {
+                    "name": "Лед",
+                    "size500": "120",
+                    "size650": "150"
+                },
+                "cane-syrup": {
+                    "name": "Тростниковый сироп",
+                    "size500": "5",
+                    "size650": "5"
+                },
+                "cheese-foam": {
+                    "name": "Сырная пенка",
+                    "size500": "70",
+                    "size650": "70"
+                },
+                "oreo-crumbs": {
+                    "name": "Крошка печенья Орео",
+                    "size500": "",
+                    "size650": ""
+                }
             },
-            'salted-caramel': {
-                name: 'Соленый крекер',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/solyoniy-kreker.jpg',
-                allIngredients: { 'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 'milk': { name: 'Молоко 3,2%', size500: '140', size650: '180' }, 'assam-tea': { name: 'Чай Ассам заготовка', size500: '50', size650: '75' }, 'caramel-topping': { name: 'Топпинг Соленая карамель', size500: '55', size650: '70' }, 'cane-syrup': { name: 'Тростниковый сироп', size500: '5', size650: '5' }, 'cheese-foam': { name: 'Сырная пенка', size500: '70', size650: '70' }, 'ice': { name: 'Лед', size500: '120', size650: '150' }, 'cracker-crumbs': { name: 'Крошка печенья "соленый крекер"', size500: '', size650: '' } },
-                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['milk', 'assam-tea', 'caramel-topping'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca', 'ice', 'cane-syrup'] }, { description: 'Перелить содержимое шейкера в стакан.', ingredientKeys: [] }, { description: 'Украсить:', ingredientKeys: ['cheese-foam', 'cracker-crumbs'] } ]
-            },
-            'cocoa': {
-                name: 'Какао',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/kakao.jpg',
-                allIngredients: { 'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 'milk': { name: 'Молоко', size500: '140', size650: '180' }, 'cocoa-prep': { name: 'Какао Заготовка', size500: '35', size650: '45' }, 'cane-syrup': { name: 'Тростниковый сироп', size500: '20', size650: '25' }, 'cheese-foam': { name: 'Сырная пенка', size500: '70', size650: '70' }, 'ice': { name: 'Лед', size500: '120', size650: '150' }, 'cocoa-powder': { name: 'Какао порошок (для посыпки)', size500: '', size650: '' } },
-                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['milk', 'cocoa-prep', 'cane-syrup'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca', 'ice'] }, { description: 'Перелить содержимое в стакан.', ingredientKeys: [] }, { description: 'Украсить:', ingredientKeys: ['cheese-foam', 'cocoa-powder'] } ]
-            },
-            'matcha-coconut': {
-                name: 'Зеленая матча кокос',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/zelyonaya-matcha-kokos.jpg',
-                allIngredients: { 'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 'milk': { name: 'Молоко', size500: '140', size650: '180' }, 'matcha-prep': { name: 'Матча Заготовка', size500: '35', size650: '45' }, 'coconut-concentrate': { name: 'Концентрат кокос', size500: '20', size650: '25' }, 'cheese-foam': { name: 'Сырная пенка', size500: '70', size650: '70' }, 'ice': { name: 'Лед', size500: '120', size650: '150' }, 'cane-syrup': { name: 'Тростниковый сироп', size500: '5', size650: '5' }, 'matcha-powder': { name: 'Матча порошок', size500: '', size650: '' } },
-                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['milk', 'matcha-prep', 'coconut-concentrate'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca', 'ice', 'cane-syrup'] }, { description: 'Перелить содержимое в стакан.', ingredientKeys: [] }, { description: 'Украсить:', ingredientKeys: ['cheese-foam', 'matcha-powder'] } ]
-            },
-            'berry-mood': {
-                name: 'Ягодное настроение',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/yagodnoye-nastroenie.jpg',
-                allIngredients: { 'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 'assam-tea': { name: 'Чай ассам заготовка', size500: '50', size650: '75' }, 'milk': { name: 'Молоко 3,2%', size500: '140', size650: '180' }, 'raspberry-concentrate': { name: 'Концентрат Малина', size500: '25', size650: '30' }, 'blueberry-concentrate': { name: 'Концентрат Черника', size500: '25', size650: '30' }, 'cane-syrup': { name: 'Тростниковый сироп', size500: '5', size650: '5' }, 'ice': { name: 'Лед', size500: '120', size650: '150' }, 'cheese-foam': { name: 'Сырная пенка', size500: '70', size650: '70' }, 'berries-garnish': { name: 'Ягоды черники/малины', size500: '', size650: '' } },
-                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['assam-tea', 'milk', 'raspberry-concentrate', 'blueberry-concentrate'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca', 'ice', 'cane-syrup'] }, { description: 'Перелить содержимое шейкера в стакан.', ingredientKeys: [] }, { description: 'Украсить:', ingredientKeys: ['cheese-foam', 'berries-garnish'] } ]
-            },
-            'banana-ice-cream': {
-                name: 'Банановое мороженое',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/banan.jpg',
-                allIngredients: { 'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 'assam-tea': { name: 'Чай ассам заготовка', size500: '50', size650: '75' }, 'milk': { name: 'Молоко', size500: '140', size650: '180' }, 'banana-concentrate': { name: 'Концентрат Банан', size500: '35', size650: '40' }, 'condensed-milk': { name: 'Сгущеное молоко', size500: '25', size650: '30' }, 'ice': { name: 'Лед', size500: '120', size650: '150' }, 'cheese-foam': { name: 'Сырная пенка', size500: '70', size650: '70' } },
-                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['assam-tea', 'milk', 'banana-concentrate', 'condensed-milk'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca', 'ice'] }, { description: 'Перелить содержимое шейкера в стакан.', ingredientKeys: [] }, { description: 'Украсить:', ingredientKeys: ['cheese-foam'] } ]
-            },
-            'snickers': {
-                name: 'Сникерс (милкшейк)',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/snickers.jpg',
-                allIngredients: { 'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 'ice-cream': { name: 'Мороженое 15-20%', size500: '180', size650: '230' }, 'milk': { name: 'Молоко 3,2%', size500: '180', size650: '230' }, 'caramel-syrup': { name: 'Сироп/топинг карамель', size500: '20', size650: '30' }, 'nut-syrup': { name: 'Сироп лесной орех', size500: '10', size650: '20' }, 'peanuts': { name: 'Жареный Арахис', size500: '5', size650: '5' } },
-                steps: [ { description: 'В блендере взбить:', ingredientKeys: ['ice-cream', 'milk', 'caramel-syrup', 'nut-syrup'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca'] }, { description: 'Перелить содержимое блендера в стакан.', ingredientKeys: [] }, { description: 'Украсить:', ingredientKeys: ['peanuts'] } ]
-            },
-            'bounty': {
-                name: 'Баунти (милкшейк)',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/bounty.jpg',
-                allIngredients: { 'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 'ice-cream': { name: 'Мороженое 15-20%', size500: '190', size650: '240' }, 'milk': { name: 'Молоко 3,2%', size500: '180', size650: '230' }, 'coconut-concentrate': { name: 'Концентрат Кокос', size500: '20', size650: '30' }, 'almond-syrup': { name: 'Сироп миндаль', size500: '10', size650: '20' }, 'coconut-flakes': { name: 'Кокосовая стружка', size500: '5', size650: '5' } },
-                steps: [ { description: 'В блендере взбить:', ingredientKeys: ['ice-cream', 'milk', 'coconut-concentrate', 'almond-syrup'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca'] }, { description: 'Перелить содержимое блендера в стакан.', ingredientKeys: [] }, { description: 'Украсить:', ingredientKeys: ['coconut-flakes'] } ]
-            },
-            'blueberry-strawberry': {
-                name: 'Черника-Клубника (милкшейк)',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/chernika-klubnika.jpg',
-                allIngredients: { 'tapioca-balls': { name: 'Тапиока/Джусболы', size500: '80', size650: '100' }, 'ice-cream': { name: 'Мороженое 15-20%', size500: '150', size650: '200' }, 'milk': { name: 'Молоко 3,2%', size500: '180', size650: '230' }, 'strawberry-puree': { name: 'Ягода(пюре) Клубника', size500: '20', size650: '30' }, 'blueberry-puree': { name: 'Ягода(пюре) Черника', size500: '20', size650: '30' }, 'strawberry-topping': { name: 'Топинг клубника', size500: '20', size650: '30' } },
-                steps: [ { description: 'В блендере взбить:', ingredientKeys: ['ice-cream', 'milk', 'strawberry-puree', 'blueberry-puree', 'strawberry-topping'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca-balls'] }, { description: 'Перелить содержимое блендера в стакан.', ingredientKeys: [] } ]
-            },
-            'lemonade-raspberry-pomegranate': {
-                name: 'Лимонад Малина-Гранат',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/limonad-malina-granat.jpg',
-                allIngredients: { 'juice-balls': { name: 'Джус боллы', size500: '60', size650: '80' }, 'sparkling-water': { name: 'Газированная Вода', size500: '225', size650: '275' }, 'raspberry-concentrate': { name: 'Концентрат Малина', size500: '40', size650: '35' }, 'berries': { name: 'Ягода малина,гранат', size500: '10/10', size650: '15/15' }, 'ice': { name: 'Лед', size500: '150', size650: '200' }, 'grenadine': { name: 'Сироп Гренадин', size500: '20', size650: '35' } },
-                steps: [ { description: 'В питчере смешать (ложкой):', ingredientKeys: ['raspberry-concentrate', 'grenadine', 'berries', 'sparkling-water'] }, { description: 'В стакан добавить:', ingredientKeys: ['juice-balls', 'ice'] }, { description: 'Перелить содержимое в стакан.', ingredientKeys: [] } ]
-            },
-            'lemonade-mango-passion': {
-                name: 'Лимонад Манго-Маракуйя',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/limonad-mango-marakuya.jpg',
-                allIngredients: { 'juice-balls': { name: 'Джус боллы', size500: '60', size650: '80' }, 'sparkling-water': { name: 'Газированная Вода', size500: '225', size650: '275' }, 'mango-passion-concentrate': { name: 'Концентрат Манго-Маракуйя', size500: '60', size650: '80' }, 'mango-pieces': { name: 'Манго свежее кусочки', size500: '20', size650: '30' }, 'ice': { name: 'Лед', size500: '150', size650: '200' } },
-                steps: [ { description: 'В питчере смешать (ложкой):', ingredientKeys: ['mango-passion-concentrate', 'mango-pieces', 'sparkling-water'] }, { description: 'В стакан добавить:', ingredientKeys: ['juice-balls', 'ice'] }, { description: 'Перелить содержимое в стакан.', ingredientKeys: [] } ]
-            },
-            'lemonade-pear-kiwi': {
-                name: 'Лимонад Груша-Киви',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/limonad-grusha-kivi.jpg',
-                allIngredients: { 'juice-balls': { name: 'Джус боллы', size500: '60', size650: '80' }, 'sparkling-water': { name: 'Газированная Вода', size500: '225', size650: '275' }, 'pear-concentrate': { name: 'Концентрат Груша', size500: '40', size650: '50' }, 'kiwi-concentrate': { name: 'Концентрат Киви', size500: '20', size650: '25' }, 'kiwi-fresh': { name: 'Киви свежий', size500: '20', size650: '30' }, 'ice': { name: 'Лед', size500: '150', size650: '200' } },
-                steps: [ { description: 'В питчере смешать (ложкой):', ingredientKeys: ['pear-concentrate', 'kiwi-concentrate', 'sparkling-water'] }, { description: 'В стакан добавить:', ingredientKeys: ['juice-balls', 'kiwi-fresh', 'ice'] }, { description: 'Перелить содержимое в стакан.', ingredientKeys: [] } ]
-            },
-            'lemonade-pineapple-peach': {
-                name: 'Лимонад Ананас-Персик',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/limonad-ananas-persik.jpg',
-                allIngredients: { 'juice-balls': { name: 'Джус боллы', size500: '60', size650: '80' }, 'sparkling-water': { name: 'Газированная Вода', size500: '225', size650: '275' }, 'pineapple-concentrate': { name: 'Концентрат Ананас', size500: '40', size650: '50' }, 'peach-concentrate': { name: 'Концентрат Персик', size500: '20', size650: '25' }, 'ice': { name: 'Лед', size500: '150', size650: '200' } },
-                steps: [ { description: 'В питчере смешать (ложкой):', ingredientKeys: ['pineapple-concentrate', 'peach-concentrate', 'sparkling-water'] }, { description: 'В стакан добавить:', ingredientKeys: ['juice-balls', 'ice'] }, { description: 'Перелить содержимое в стакан.', ingredientKeys: [] } ]
-            },
-            'tea-raspberry-pomegranate': {
-                name: 'Джус боллы Малина-Гранат',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/balls-malina-granat.jpg',
-                allIngredients: { 'juice-balls': { name: 'Джус боллы', size500: '60', size650: '80' }, 'green-tea': { name: 'Чай зеленый с жасмином', size500: '100', size650: '125' }, 'water': { name: 'Вода', size500: '125', size650: '150' }, 'raspberry-concentrate': { name: 'Концентрат Малина', size500: '40', size650: '50' }, 'berries': { name: 'Ягода малина,гранат', size500: '10/10', size650: '15/15' }, 'grenadine': { name: 'Сироп Гренадин', size500: '20', size650: '25' }, 'ice': { name: 'Лед', size500: '120', size650: '150' } },
-                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['green-tea', 'water', 'raspberry-concentrate', 'grenadine', 'berries'] }, { description: 'В стакан добавить:', ingredientKeys: ['juice-balls', 'ice'] }, { description: 'Перелить содержимое шейкера в стакан.', ingredientKeys: [] } ]
-            },
-            'tea-mango-passion': {
-                name: 'Джус боллы Манго-Маракуйя',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/balls-mango-marakuya.jpg',
-                allIngredients: { 'juice-balls': { name: 'Джус боллы', size500: '60', size650: '80' }, 'green-tea': { name: 'Чай зеленый с жасмином', size500: '120', size650: '150' }, 'water': { name: 'Вода', size500: '100', size650: '120' }, 'mango-passion-concentrate': { name: 'Концентрат Манго-Маракуйя', size500: '60', size650: '80' }, 'mango-pieces': { name: 'Манго свежее кусочки', size500: '20', size650: '30' }, 'ice': { name: 'Лед', size500: '120', size650: '150' } },
-                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['green-tea', 'water', 'mango-passion-concentrate', 'mango-pieces'] }, { description: 'В стакан добавить:', ingredientKeys: ['juice-balls', 'ice'] }, { description: 'Перелить содержимое шейкера в стакан.', ingredientKeys: [] } ]
-            },
-            'tea-pear-kiwi': {
-                name: 'Джус боллы Груша-Киви',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/balls-grusha-kivi.jpg',
-                allIngredients: { 'juice-balls': { name: 'Джус боллы', size500: '60', size650: '80' }, 'green-tea': { name: 'Чай зеленый с жасмином', size500: '120', size650: '150' }, 'water': { name: 'Вода', size500: '100', size650: '120' }, 'pear-concentrate': { name: 'Концентрат Груша', size500: '40', size650: '50' }, 'kiwi-concentrate': { name: 'Концентрат Киви', size500: '20', size650: '25' }, 'kiwi-fresh': { name: 'Киви свежий', size500: '20', size650: '30' }, 'ice': { name: 'Лед', size500: '120', size650: '150' } },
-                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['green-tea', 'water', 'pear-concentrate', 'kiwi-concentrate'] }, { description: 'В стакан добавить:', ingredientKeys: ['juice-balls', 'kiwi-fresh', 'ice'] }, { description: 'Перелить содержимое шейкера в стакан.', ingredientKeys: [] } ]
-            },
-            'tea-pineapple-peach': {
-                name: 'Джус боллы Ананас-Персик',
-                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/balls-ananas-persik.jpg',
-                allIngredients: { 'juice-balls': { name: 'Джус боллы', size500: '60', size650: '80' }, 'green-tea': { name: 'Чай зеленый с жасмином', size500: '120', size650: '150' }, 'water': { name: 'Вода', size500: '100', size650: '120' }, 'pineapple-concentrate': { name: 'Концентрат Ананас', size500: '40', size650: '50' }, 'peach-concentrate': { name: 'Концентрат Персик', size500: '20', size650: '25' }, 'ice': { name: 'Лед', size500: '120', size650: '150' } },
-                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['green-tea', 'water', 'pineapple-concentrate', 'peach-concentrate'] }, { description: 'В стакан добавить:', ingredientKeys: ['juice-balls', 'ice'] }, { description: 'Перелить содержимое шейкера в стакан.', ingredientKeys: [] } ]
-            }
+            "steps": [
+                {
+                    "description": "В шейкере смешатАААААААААААААААААААААь:",
+                    "ingredientKeys": [
+                        "assam-tea",
+                        "milk",
+                        "condensed-milk",
+                        "cocoa-prep"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "tapioca",
+                        "ice",
+                        "cane-syrup"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое шейкера в стакан.",
+                    "ingredientKeys": []
+                },
+                {
+                    "description": "Украсить:",
+                    "ingredientKeys": [
+                        "cheese-foam",
+                        "oreo-crumbs"
+                    ]
+                }
+            ]
         },
-        preparations: {
-            'cocoa-prep': {
-                name: 'Какао заготовка',
-                description: 'В питчере тщательно смешать 10 грамм какао-порошка и 100 мл горячей воды до полного растворения.'
+        "salted-caramel": {
+            "name": "Соленый крекер",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/solyoniy-kreker.jpg",
+            "allIngredients": {
+                "tapioca": {
+                    "name": "Тапиока",
+                    "size500": "80",
+                    "size650": "100"
+                },
+                "milk": {
+                    "name": "Молоко 3,2%",
+                    "size500": "140",
+                    "size650": "180"
+                },
+                "assam-tea": {
+                    "name": "Чай Ассам заготовка",
+                    "size500": "50",
+                    "size650": "75"
+                },
+                "caramel-topping": {
+                    "name": "Топпинг Соленая карамель",
+                    "size500": "55",
+                    "size650": "70"
+                },
+                "cane-syrup": {
+                    "name": "Тростниковый сироп",
+                    "size500": "5",
+                    "size650": "5"
+                },
+                "cheese-foam": {
+                    "name": "Сырная пенка",
+                    "size500": "70",
+                    "size650": "70"
+                },
+                "ice": {
+                    "name": "Лед",
+                    "size500": "120",
+                    "size650": "150"
+                },
+                "cracker-crumbs": {
+                    "name": "Крошка печенья \"соленый крекер\"",
+                    "size500": "",
+                    "size650": ""
+                }
             },
-            'assam-tea': {
-                name: 'Чай Ассам заготовка',
-                description: '25 грамм чая "Ассам" заварить в 1 литре воды (95°C) в течение 10 минут, затем процедить.'
+            "steps": [
+                {
+                    "description": "В шейкере смешать:",
+                    "ingredientKeys": [
+                        "milk",
+                        "assam-tea",
+                        "caramel-topping"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "tapioca",
+                        "ice",
+                        "cane-syrup"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое шейкера в стакан.",
+                    "ingredientKeys": []
+                },
+                {
+                    "description": "Украсить:",
+                    "ingredientKeys": [
+                        "cheese-foam",
+                        "cracker-crumbs"
+                    ]
+                }
+            ]
+        },
+        "cocoa": {
+            "name": "Какао",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/kakao.jpg",
+            "allIngredients": {
+                "tapioca": {
+                    "name": "Тапиока",
+                    "size500": "80",
+                    "size650": "100"
+                },
+                "milk": {
+                    "name": "Молоко 3,2%",
+                    "size500": "140",
+                    "size650": "180"
+                },
+                "cocoa-prep": {
+                    "name": "Какао Заготовка",
+                    "size500": "35",
+                    "size650": "45"
+                },
+                "cane-syrup": {
+                    "name": "Тростниковый сироп",
+                    "size500": "20",
+                    "size650": "25"
+                },
+                "cheese-foam": {
+                    "name": "Сырная пенка",
+                    "size500": "70",
+                    "size650": "70"
+                },
+                "ice": {
+                    "name": "Лед",
+                    "size500": "120",
+                    "size650": "150"
+                },
+                "cocoa-powder": {
+                    "name": "Какао порошок (для посыпки)",
+                    "size500": "",
+                    "size650": ""
+                }
             },
-            'jasmine-green-tea': {
-                name: 'Чай зеленый с жасмином заготовка',
-                description: '20 грамм зеленого чая с жасмином заварить в 1 литре воды (80°C) в течение 5-7 минут, затем процедить.'
-            }
+            "steps": [
+                {
+                    "description": "В шейкере смешать:",
+                    "ingredientKeys": [
+                        "milk",
+                        "cocoa-prep",
+                        "cane-syrup"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "tapioca",
+                        "ice"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое в стакан.",
+                    "ingredientKeys": []
+                },
+                {
+                    "description": "Украсить:",
+                    "ingredientKeys": [
+                        "cheese-foam",
+                        "cocoa-powder"
+                    ]
+                }
+            ]
+        },
+        "matcha-coconut": {
+            "name": "Зеленая матча кокос",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/zelyonaya-matcha-kokos.jpg",
+            "allIngredients": {
+                "tapioca": {
+                    "name": "Тапиока",
+                    "size500": "80",
+                    "size650": "100"
+                },
+                "milk": {
+                    "name": "Молоко 3,2%",
+                    "size500": "140",
+                    "size650": "180"
+                },
+                "matcha-prep": {
+                    "name": "Матча Заготовка",
+                    "size500": "35",
+                    "size650": "45"
+                },
+                "coconut-concentrate": {
+                    "name": "Концентрат кокос",
+                    "size500": "20",
+                    "size650": "25"
+                },
+                "cheese-foam": {
+                    "name": "Сырная пенка",
+                    "size500": "70",
+                    "size650": "70"
+                },
+                "ice": {
+                    "name": "Лед",
+                    "size500": "120",
+                    "size650": "150"
+                },
+                "cane-syrup": {
+                    "name": "Тростниковый сироп",
+                    "size500": "5",
+                    "size650": "5"
+                },
+                "matcha-powder": {
+                    "name": "Матча порошок",
+                    "size500": "",
+                    "size650": ""
+                }
+            },
+            "steps": [
+                {
+                    "description": "В шейкере смешать:",
+                    "ingredientKeys": [
+                        "milk",
+                        "matcha-prep",
+                        "coconut-concentrate"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "tapioca",
+                        "ice",
+                        "cane-syrup"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое в стакан.",
+                    "ingredientKeys": []
+                },
+                {
+                    "description": "Украсить:",
+                    "ingredientKeys": [
+                        "cheese-foam",
+                        "matcha-powder"
+                    ]
+                }
+            ]
+        },
+        "berry-mood": {
+            "name": "Ягодное настроение",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/yagodnoye-nastroenie.jpg",
+            "allIngredients": {
+                "tapioca": {
+                    "name": "Тапиока",
+                    "size500": "80",
+                    "size650": "100"
+                },
+                "assam-tea": {
+                    "name": "Чай ассам заготовка",
+                    "size500": "50",
+                    "size650": "75"
+                },
+                "milk": {
+                    "name": "Молоко 3,2%",
+                    "size500": "140",
+                    "size650": "180"
+                },
+                "raspberry-concentrate": {
+                    "name": "Концентрат Малина",
+                    "size500": "25",
+                    "size650": "30"
+                },
+                "blueberry-concentrate": {
+                    "name": "Концентрат Черника",
+                    "size500": "25",
+                    "size650": "30"
+                },
+                "cane-syrup": {
+                    "name": "Тростниковый сироп",
+                    "size500": "5",
+                    "size650": "5"
+                },
+                "ice": {
+                    "name": "Лед",
+                    "size500": "120",
+                    "size650": "150"
+                },
+                "cheese-foam": {
+                    "name": "Сырная пенка",
+                    "size500": "70",
+                    "size650": "70"
+                },
+                "berries-garnish": {
+                    "name": "Ягоды черники/малины",
+                    "size500": "",
+                    "size650": ""
+                }
+            },
+            "steps": [
+                {
+                    "description": "В шейкере смешать:",
+                    "ingredientKeys": [
+                        "assam-tea",
+                        "milk",
+                        "raspberry-concentrate",
+                        "blueberry-concentrate"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "tapioca",
+                        "ice",
+                        "cane-syrup"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое шейкера в стакан.",
+                    "ingredientKeys": []
+                },
+                {
+                    "description": "Украсить:",
+                    "ingredientKeys": [
+                        "cheese-foam",
+                        "berries-garnish"
+                    ]
+                }
+            ]
+        },
+        "banana-ice-cream": {
+            "name": "Банановое мороженое",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/banan.jpg",
+            "allIngredients": {
+                "tapioca": {
+                    "name": "Тапиока",
+                    "size500": "80",
+                    "size650": "100"
+                },
+                "assam-tea": {
+                    "name": "Чай ассам заготовка",
+                    "size500": "50",
+                    "size650": "75"
+                },
+                "milk": {
+                    "name": "Молоко 3,2%",
+                    "size500": "140",
+                    "size650": "180"
+                },
+                "banana-concentrate": {
+                    "name": "Концентрат Банан",
+                    "size500": "35",
+                    "size650": "40"
+                },
+                "condensed-milk": {
+                    "name": "Сгущёное молоко",
+                    "size500": "25",
+                    "size650": "30"
+                },
+                "ice": {
+                    "name": "Лед",
+                    "size500": "120",
+                    "size650": "150"
+                },
+                "cheese-foam": {
+                    "name": "Сырная пенка",
+                    "size500": "70",
+                    "size650": "70"
+                }
+            },
+            "steps": [
+                {
+                    "description": "В шейкере смешать:",
+                    "ingredientKeys": [
+                        "assam-tea",
+                        "milk",
+                        "banana-concentrate",
+                        "condensed-milk"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "tapioca",
+                        "ice"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое шейкера в стакан.",
+                    "ingredientKeys": []
+                },
+                {
+                    "description": "Украсить:",
+                    "ingredientKeys": [
+                        "cheese-foam"
+                    ]
+                }
+            ]
+        },
+        "snickers": {
+            "name": "Сникерс (милкшейк)",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/snickers.jpg",
+            "allIngredients": {
+                "tapioca": {
+                    "name": "Тапиока",
+                    "size500": "80",
+                    "size650": "100"
+                },
+                "ice-cream": {
+                    "name": "Мороженое 15-20%",
+                    "size500": "180",
+                    "size650": "230"
+                },
+                "milk": {
+                    "name": "Молоко 3,2%",
+                    "size500": "180",
+                    "size650": "230"
+                },
+                "caramel-syrup": {
+                    "name": "Сироп/топинг карамель",
+                    "size500": "20",
+                    "size650": "30"
+                },
+                "nut-syrup": {
+                    "name": "Сироп лесной орех",
+                    "size500": "10",
+                    "size650": "20"
+                },
+                "peanuts": {
+                    "name": "Жареный Арахис",
+                    "size500": "5",
+                    "size650": "5"
+                }
+            },
+            "steps": [
+                {
+                    "description": "В блендере взбить:",
+                    "ingredientKeys": [
+                        "ice-cream",
+                        "milk",
+                        "caramel-syrup",
+                        "nut-syrup"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "tapioca"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое блендера в стакан.",
+                    "ingredientKeys": []
+                },
+                {
+                    "description": "Украсить:",
+                    "ingredientKeys": [
+                        "peanuts"
+                    ]
+                }
+            ]
+        },
+        "bounty": {
+            "name": "Баунти (милкшейк)",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/bounty.jpg",
+            "allIngredients": {
+                "tapioca": {
+                    "name": "Тапиока",
+                    "size500": "80",
+                    "size650": "100"
+                },
+                "ice-cream": {
+                    "name": "Мороженое 15-20%",
+                    "size500": "190",
+                    "size650": "240"
+                },
+                "milk": {
+                    "name": "Молоко 3,2%",
+                    "size500": "180",
+                    "size650": "230"
+                },
+                "coconut-concentrate": {
+                    "name": "Концентрат Кокос",
+                    "size500": "20",
+                    "size650": "30"
+                },
+                "almond-syrup": {
+                    "name": "Сироп миндаль",
+                    "size500": "10",
+                    "size650": "20"
+                },
+                "coconut-flakes": {
+                    "name": "Кокосовая стружка",
+                    "size500": "5",
+                    "size650": "5"
+                }
+            },
+            "steps": [
+                {
+                    "description": "В блендере взбить:",
+                    "ingredientKeys": [
+                        "ice-cream",
+                        "milk",
+                        "coconut-concentrate",
+                        "almond-syrup"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "tapioca"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое блендера в стакан.",
+                    "ingredientKeys": []
+                },
+                {
+                    "description": "Украсить:",
+                    "ingredientKeys": [
+                        "coconut-flakes"
+                    ]
+                }
+            ]
+        },
+        "blueberry-strawberry": {
+            "name": "Черника-Клубника (милкшейк)",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/chernika-klubnika.jpg",
+            "allIngredients": {
+                "tapioca-balls": {
+                    "name": "Тапиока/Джусболы",
+                    "size500": "80",
+                    "size650": "100"
+                },
+                "ice-cream": {
+                    "name": "Мороженое 15-20%",
+                    "size500": "150",
+                    "size650": "200"
+                },
+                "milk": {
+                    "name": "Молоко 3,2%",
+                    "size500": "180",
+                    "size650": "230"
+                },
+                "strawberry-puree": {
+                    "name": "Ягода Клубника",
+                    "size500": "20",
+                    "size650": "30"
+                },
+                "blueberry-puree": {
+                    "name": "Ягода Черника",
+                    "size500": "20",
+                    "size650": "30"
+                },
+                "strawberry-topping": {
+                    "name": "Топинг клубника",
+                    "size500": "20",
+                    "size650": "30"
+                }
+            },
+            "steps": [
+                {
+                    "description": "В блендере взбить:",
+                    "ingredientKeys": [
+                        "ice-cream",
+                        "milk",
+                        "strawberry-puree",
+                        "blueberry-puree",
+                        "strawberry-topping"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "tapioca-balls"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое блендера в стакан.",
+                    "ingredientKeys": []
+                }
+            ]
+        },
+        "lemonade-raspberry-pomegranate": {
+            "name": "Лимонад Малина-Гранат",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/limonad-malina-granat.jpg",
+            "allIngredients": {
+                "juice-balls": {
+                    "name": "Джус боллы",
+                    "size500": "60",
+                    "size650": "80"
+                },
+                "sparkling-water": {
+                    "name": "Газированная Вода",
+                    "size500": "225",
+                    "size650": "275"
+                },
+                "raspberry-concentrate": {
+                    "name": "Концентрат Малина",
+                    "size500": "40",
+                    "size650": "35"
+                },
+                "berries": {
+                    "name": "Ягода малина,гранат",
+                    "size500": "10/10",
+                    "size650": "15/15"
+                },
+                "ice": {
+                    "name": "Лед",
+                    "size500": "150",
+                    "size650": "200"
+                },
+                "grenadine": {
+                    "name": "Сироп Гренадин",
+                    "size500": "20",
+                    "size650": "35"
+                }
+            },
+            "steps": [
+                {
+                    "description": "В питчере смешать (ложкой):",
+                    "ingredientKeys": [
+                        "raspberry-concentrate",
+                        "grenadine",
+                        "berries",
+                        "sparkling-water"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "juice-balls",
+                        "ice"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое в стакан.",
+                    "ingredientKeys": []
+                }
+            ]
+        },
+        "lemonade-mango-passion": {
+            "name": "Лимонад Манго-Маракуйя",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/limonad-mango-marakuya.jpg",
+            "allIngredients": {
+                "juice-balls": {
+                    "name": "Джус боллы",
+                    "size500": "60",
+                    "size650": "80"
+                },
+                "sparkling-water": {
+                    "name": "Газированная Вода",
+                    "size500": "225",
+                    "size650": "275"
+                },
+                "mango-passion-concentrate": {
+                    "name": "Концентрат Манго-Маракуйя",
+                    "size500": "60",
+                    "size650": "80"
+                },
+                "mango-pieces": {
+                    "name": "Манго свежее кусочки",
+                    "size500": "20",
+                    "size650": "30"
+                },
+                "ice": {
+                    "name": "Лед",
+                    "size500": "150",
+                    "size650": "200"
+                }
+            },
+            "steps": [
+                {
+                    "description": "В питчере смешать (ложкой):",
+                    "ingredientKeys": [
+                        "mango-passion-concentrate",
+                        "mango-pieces",
+                        "sparkling-water"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "juice-balls",
+                        "ice"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое в стакан.",
+                    "ingredientKeys": []
+                }
+            ]
+        },
+        "lemonade-pear-kiwi": {
+            "name": "Лимонад Груша-Киви",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/limonad-grusha-kivi.jpg",
+            "allIngredients": {
+                "juice-balls": {
+                    "name": "Джус боллы",
+                    "size500": "60",
+                    "size650": "80"
+                },
+                "sparkling-water": {
+                    "name": "Газированная Вода",
+                    "size500": "225",
+                    "size650": "275"
+                },
+                "pear-concentrate": {
+                    "name": "Концентрат Груша",
+                    "size500": "40",
+                    "size650": "50"
+                },
+                "kiwi-concentrate": {
+                    "name": "Концентрат Киви",
+                    "size500": "20",
+                    "size650": "25"
+                },
+                "kiwi-fresh": {
+                    "name": "Киви свежий",
+                    "size500": "20",
+                    "size650": "30"
+                },
+                "ice": {
+                    "name": "Лед",
+                    "size500": "150",
+                    "size650": "200"
+                }
+            },
+            "steps": [
+                {
+                    "description": "В питчере смешать (ложкой):",
+                    "ingredientKeys": [
+                        "pear-concentrate",
+                        "kiwi-concentrate",
+                        "sparkling-water"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "juice-balls",
+                        "kiwi-fresh",
+                        "ice"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое в стакан.",
+                    "ingredientKeys": []
+                }
+            ]
+        },
+        "lemonade-pineapple-peach": {
+            "name": "Лимонад Ананас-Персик",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/limonad-ananas-persik.jpg",
+            "allIngredients": {
+                "juice-balls": {
+                    "name": "Джус боллы",
+                    "size500": "60",
+                    "size650": "80"
+                },
+                "sparkling-water": {
+                    "name": "Газированная Вода",
+                    "size500": "225",
+                    "size650": "275"
+                },
+                "pineapple-concentrate": {
+                    "name": "Концентрат Ананас",
+                    "size500": "40",
+                    "size650": "50"
+                },
+                "peach-concentrate": {
+                    "name": "Концентрат Персик",
+                    "size500": "20",
+                    "size650": "25"
+                },
+                "ice": {
+                    "name": "Лед",
+                    "size500": "150",
+                    "size650": "200"
+                }
+            },
+            "steps": [
+                {
+                    "description": "В питчере смешать (ложкой):",
+                    "ingredientKeys": [
+                        "pineapple-concentrate",
+                        "peach-concentrate",
+                        "sparkling-water"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "juice-balls",
+                        "ice"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое в стакан.",
+                    "ingredientKeys": []
+                }
+            ]
+        },
+        "tea-raspberry-pomegranate": {
+            "name": "Джус боллы Малина-Гранат",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/balls-malina-granat.jpg",
+            "allIngredients": {
+                "juice-balls": {
+                    "name": "Джус боллы",
+                    "size500": "60",
+                    "size650": "80"
+                },
+                "green-tea": {
+                    "name": "Чай зеленый с жасмином",
+                    "size500": "100",
+                    "size650": "125"
+                },
+                "water": {
+                    "name": "Вода",
+                    "size500": "125",
+                    "size650": "150"
+                },
+                "raspberry-concentrate": {
+                    "name": "Концентрат Малина",
+                    "size500": "40",
+                    "size650": "50"
+                },
+                "berries": {
+                    "name": "Ягода малина,гранат",
+                    "size500": "10/10",
+                    "size650": "15/15"
+                },
+                "grenadine": {
+                    "name": "Сироп Гренадин",
+                    "size500": "20",
+                    "size650": "25"
+                },
+                "ice": {
+                    "name": "Лед",
+                    "size500": "120",
+                    "size650": "150"
+                }
+            },
+            "steps": [
+                {
+                    "description": "В шейкере смешать:",
+                    "ingredientKeys": [
+                        "green-tea",
+                        "water",
+                        "raspberry-concentrate",
+                        "grenadine",
+                        "berries"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "juice-balls",
+                        "ice"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое шейкера в стакан.",
+                    "ingredientKeys": []
+                }
+            ]
+        },
+        "tea-mango-passion": {
+            "name": "Джус боллы Манго-Маракуйя",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/balls-mango-marakuya.jpg",
+            "allIngredients": {
+                "juice-balls": {
+                    "name": "Джус боллы",
+                    "size500": "60",
+                    "size650": "80"
+                },
+                "green-tea": {
+                    "name": "Чай зеленый с жасмином",
+                    "size500": "120",
+                    "size650": "150"
+                },
+                "water": {
+                    "name": "Вода",
+                    "size500": "100",
+                    "size650": "120"
+                },
+                "mango-passion-concentrate": {
+                    "name": "Концентрат Манго-Маракуйя",
+                    "size500": "60",
+                    "size650": "80"
+                },
+                "mango-pieces": {
+                    "name": "Манго свежее кусочки",
+                    "size500": "20",
+                    "size650": "30"
+                },
+                "ice": {
+                    "name": "Лед",
+                    "size500": "120",
+                    "size650": "150"
+                }
+            },
+            "steps": [
+                {
+                    "description": "В шейкере смешать:",
+                    "ingredientKeys": [
+                        "green-tea",
+                        "water",
+                        "mango-passion-concentrate",
+                        "mango-pieces"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "juice-balls",
+                        "ice"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое шейкера в стакан.",
+                    "ingredientKeys": []
+                }
+            ]
+        },
+        "tea-pear-kiwi": {
+            "name": "Джус боллы Груша-Киви",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/balls-grusha-kivi.jpg",
+            "allIngredients": {
+                "juice-balls": {
+                    "name": "Джус боллы",
+                    "size500": "60",
+                    "size650": "80"
+                },
+                "green-tea": {
+                    "name": "Чай зеленый с жасмином",
+                    "size500": "120",
+                    "size650": "150"
+                },
+                "water": {
+                    "name": "Вода",
+                    "size500": "100",
+                    "size650": "120"
+                },
+                "pear-concentrate": {
+                    "name": "Концентрат Груша",
+                    "size500": "40",
+                    "size650": "50"
+                },
+                "kiwi-concentrate": {
+                    "name": "Концентрат Киви",
+                    "size500": "20",
+                    "size650": "25"
+                },
+                "kiwi-fresh": {
+                    "name": "Киви свежий",
+                    "size500": "20",
+                    "size650": "30"
+                },
+                "ice": {
+                    "name": "Лед",
+                    "size500": "120",
+                    "size650": "150"
+                }
+            },
+            "steps": [
+                {
+                    "description": "В шейкере смешать:",
+                    "ingredientKeys": [
+                        "green-tea",
+                        "water",
+                        "pear-concentrate",
+                        "kiwi-concentrate"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "juice-balls",
+                        "kiwi-fresh",
+                        "ice"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое шейкера в стакан.",
+                    "ingredientKeys": []
+                }
+            ]
+        },
+        "tea-pineapple-peach": {
+            "name": "Джус боллы Ананас-Персик",
+            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/balls-ananas-persik.jpg",
+            "allIngredients": {
+                "juice-balls": {
+                    "name": "Джус боллы",
+                    "size500": "60",
+                    "size650": "80"
+                },
+                "green-tea": {
+                    "name": "Чай зеленый с жасмином",
+                    "size500": "120",
+                    "size650": "150"
+                },
+                "water": {
+                    "name": "Вода",
+                    "size500": "100",
+                    "size650": "120"
+                },
+                "pineapple-concentrate": {
+                    "name": "Концентрат Ананас",
+                    "size500": "40",
+                    "size650": "50"
+                },
+                "peach-concentrate": {
+                    "name": "Концентрат Персик",
+                    "size500": "20",
+                    "size650": "25"
+                },
+                "ice": {
+                    "name": "Лед",
+                    "size500": "120",
+                    "size650": "150"
+                }
+            },
+            "steps": [
+                {
+                    "description": "В шейкере смешать:",
+                    "ingredientKeys": [
+                        "green-tea",
+                        "water",
+                        "pineapple-concentrate",
+                        "peach-concentrate"
+                    ]
+                },
+                {
+                    "description": "В стакан добавить:",
+                    "ingredientKeys": [
+                        "juice-balls",
+                        "ice"
+                    ]
+                },
+                {
+                    "description": "Перелить содержимое шейкера в стакан.",
+                    "ingredientKeys": []
+                }
+            ]
         }
-    };
+    },
+    "preparations": {
+        "cocoa-prep": {
+            "name": "Какао заготовка",
+            "description": "В питчере тщательно смешать 10 грамм какао-порошка и 100 мл горячей воды до полного растворения."
+        },
+        "assam-tea": {
+            "name": "Чай Ассам заготовка",
+            "description": "25 грамм чая \"Ассам\" заварить в 1 литре воды (95°C) в течение 10 минут, затем процедить."
+        },
+        "jasmine-green-tea": {
+            "name": "Чай зеленый с жасмином заготовка",
+            "description": "20 грамм зеленого чая с жасмином заварить в 1 литре воды (80°C) в течение 5-7 минут, затем процедить."
+        },
+        "prep_1762437285169": {
+            "name": "Новая заготовка",
+            "description": ""
+        }
+    }
+};
     
     // =======================================================================
     // ОСНОВНАЯ ЛОГИКА ПРИЛОЖЕНИЯ
