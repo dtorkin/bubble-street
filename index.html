@@ -1335,7 +1335,7 @@ const initialData = {
                     const amount = ingData ? (ingData['size' + volume] || '') : '';
                     return ingData ? `<tr><td>${ingData.name}</td><td>${amount}</td></tr>` : '';
                 }).join('');
-                ingredientsTableHtml = `<table class="step-ingredients-table"><thead><tr><th>Ингредиент</th><th>Вес в граммах (на ${volume}мл)</th></tr></thead><tbody>${rows}</tbody></table>`;
+                ingredientsTableHtml = `<table class="step-ingredients-table"><thead><tr><th>Ингредиент</th><th>Вес в гр (на ${volume}мл)</th></tr></thead><tbody>${rows}</tbody></table>`;
             }
             return `<li><div class="step-wrapper"><div class="step-description">${step.description}</div>${ingredientsTableHtml}</div></li>`;
         }).join('');
