@@ -10,8 +10,8 @@
         body, html { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; height: 100%; background-color: #f4f4f9; }
         .app-container { display: flex; height: 100vh; flex-direction: row; }
         .sidebar { width: 300px; background-color: #ffffff; border-right: 1px solid #ddd; display: flex; flex-direction: column; flex-shrink: 0; }
-        .sidebar-header { padding: 15px 20px; border-bottom: 1px solid #eee; cursor: pointer; } /* Добавлен курсор для заголовка */
-        .sidebar-header h2 { margin: 0; font-size: 1.2em; pointer-events: none; } /* Чтобы клик срабатывал на header */
+        .sidebar-header { padding: 15px 20px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .sidebar-header h2 { margin: 0; font-size: 1.2em; pointer-events: none; }
         .sidebar-tabs { display: flex; border-bottom: 1px solid #eee; }
         .tab-btn { flex: 1; padding: 12px; border: none; background: #f8f9fa; cursor: pointer; font-size: 1em; }
         .tab-btn.active { background: #fff; border-bottom: 3px solid var(--primary-color); font-weight: bold; }
@@ -54,14 +54,14 @@
         .sortable-ghost { opacity: 0.4; background: #c8ebfb; }
         .edit-ingredient-container { display: flex; flex-direction: column; gap: 5px; }
         .edit-ingredient { display: grid; grid-template-columns: 1fr 80px 80px auto; gap: 10px; align-items: center; }
+        .edit-ingredient-single { grid-template-columns: 1fr 120px auto; }
         .edit-ingredient-header { display: grid; grid-template-columns: 1fr 80px 80px auto; gap: 10px; font-weight: bold; font-size: 0.9em; }
+        .edit-ingredient-header-single { grid-template-columns: 1fr 120px auto; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: #fff; padding: 25px; border-radius: 8px; width: 90%; max-width: 700px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px; }
         .modal-close { font-size: 2em; cursor: pointer; line-height: 1; border: none; background: none; }
         #export-textarea { width: 100%; height: 40vh; font-family: monospace; font-size: 0.9em; resize: vertical; }
-        
-        /* --- НОВЫЕ СТИЛИ ДЛЯ РЕЖИМА АДМИНИСТРАТОРА --- */
         .admin-only { display: none !important; }
         body.admin-mode-active .admin-only { display: flex !important; }
         body.admin-mode-active .sidebar-footer { display: flex !important; }
@@ -77,6 +77,7 @@
             .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #ddd; max-height: 40vh; }
             .content { padding: 15px; }
             .edit-ingredient { grid-template-columns: 1fr 60px 60px auto; gap: 5px; }
+            .edit-ingredient-single { grid-template-columns: 1fr 80px auto; }
         }
     </style>
 </head>
@@ -116,1168 +117,333 @@
     
     <script>
     // =======================================================================
-    // ИСХОДНЫЕ ДАННЫЕ С ФОТОГРАФИЯМИ
+    // ИСХОДНЫЕ ДАННЫЕ С ФОТОГРАФИЯМИ И НОВЫМИ НАПИТКАМИ
     // =======================================================================
-const initialData = {
-    "recipes": {
-        "oreo": {
-            "name": "Орео",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/oreo.jpg",
-            "allIngredients": {
-                "assam-tea": {
-                    "name": "Чай Ассам (заготовка)",
-                    "size500": "50",
-                    "size650": "75"
+    var initialData = {
+        recipes: {
+            'classic': {
+                name: 'Классический',
+                volumeType: 'dual', // dual, single
+                imageUrl: '',
+                allIngredients: { 
+                    'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 
+                    'assam-tea': { name: 'Чай Ассам заготовка', size500: '50', size650: '75' }, 
+                    'milk': { name: 'Молоко 3,2%', size500: '70', size650: '90' },
+                    'cream': { name: 'Сливки 10%', size500: '70', size650: '90' },
+                    'cane-syrup': { name: 'Тростниковый сироп', size500: '20', size650: '25' }, 
+                    'cheese-foam': { name: 'Сырная пенка', size500: '70', size650: '70' }, 
+                    'ice': { name: 'Лед', size500: '120', size650: '150' }
                 },
-                "milk": {
-                    "name": "Молоко 3,2%",
-                    "size500": "140",
-                    "size650": "180"
-                },
-                "condensed-milk": {
-                    "name": "Сгущёное молоко",
-                    "size500": "25",
-                    "size650": "30"
-                },
-                "cocoa-prep": {
-                    "name": "Какао (заготовка)",
-                    "size500": "25",
-                    "size650": "30"
-                },
-                "tapioca": {
-                    "name": "Тапиока",
-                    "size500": "80",
-                    "size650": "100"
-                },
-                "ice": {
-                    "name": "Лёд",
-                    "size500": "120",
-                    "size650": "150"
-                },
-                "cane-syrup": {
-                    "name": "Тростниковый сироп",
-                    "size500": "5",
-                    "size650": "5"
-                },
-                "cheese-foam": {
-                    "name": "Сырная пенка",
-                    "size500": "70",
-                    "size650": "70"
-                },
-                "oreo-crumbs": {
-                    "name": "Крошка печенья Орео",
-                    "size500": "",
-                    "size650": ""
-                }
+                steps: [ 
+                    { description: 'В шейкере смешать:', ingredientKeys: ['milk', 'assam-tea', 'cane-syrup', 'cream'] }, 
+                    { description: 'В стакан добавить тапиоку, лед и украсить стенки тростниковым сиропом.', ingredientKeys: ['tapioca', 'ice'] }, 
+                    { description: 'Перелить содержимое в стакан.', ingredientKeys: [] }, 
+                    { description: 'Украсить:', ingredientKeys: ['cheese-foam'] } 
+                ]
             },
-            "steps": [
-                {
-                    "description": "В шейкере смешатАААААААААААААААААААААь:",
-                    "ingredientKeys": [
-                        "assam-tea",
-                        "milk",
-                        "condensed-milk",
-                        "cocoa-prep"
-                    ]
+            'cold-brew': {
+                name: 'КолдБрю',
+                volumeType: 'dual',
+                imageUrl: '',
+                allIngredients: { 
+                    'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 
+                    'espresso': { name: 'Кофе (Эспрессо)', size500: '50', size650: '75' }, 
+                    'baked-milk': { name: 'Топленое молоко', size500: '70', size650: '90' },
+                    'cream': { name: 'Сливки 10%', size500: '70', size650: '90' },
+                    'cane-syrup': { name: 'Тростниковый сироп', size500: '20', size650: '25' }, 
+                    'cheese-foam': { name: 'Сырная пенка', size500: '70', size650: '70' }, 
+                    'ice': { name: 'Лед', size500: '120', size650: '150' }
                 },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "tapioca",
-                        "ice",
-                        "cane-syrup"
-                    ]
+                steps: [ 
+                    { description: 'В шейкере смешать:', ingredientKeys: ['baked-milk', 'espresso', 'cane-syrup', 'cream'] }, 
+                    { description: 'В стакан добавить тапиоку, лед и украсить стенки тростниковым сиропом.', ingredientKeys: ['tapioca', 'ice'] },
+                    { description: 'Перелить содержимое в стакан.', ingredientKeys: [] }, 
+                    { description: 'Украсить:', ingredientKeys: ['cheese-foam'] } 
+                ]
+            },
+            'hot-snickers': {
+                name: 'Сникерс (горячий)',
+                volumeType: 'single',
+                volume: '500 мл',
+                imageUrl: '',
+                allIngredients: {
+                    'tapioca': { name: 'Тапиока', quantity: '80гр' },
+                    'milk': { name: 'Молоко', quantity: '270гр' },
+                    'assam-tea': { name: 'Заготовка чая Ассам', quantity: '75гр' },
+                    'peanut-syrup': { name: 'Сироп арахис в карамели', quantity: '40гр' },
+                    'choco-syrup': { name: 'Сироп шоколад', quantity: '20гр' },
+                    'cheese-foam': { name: 'Сырная пенка', quantity: '70гр' },
+                    'peanuts': { name: 'Арахис жареный', quantity: '5гр' }
                 },
-                {
-                    "description": "Перелить содержимое шейкера в стакан.",
-                    "ingredientKeys": []
+                steps: [
+                    { description: 'Взбить в питчере до 65-70°С с минимальной пенкой:', ingredientKeys: ['milk', 'assam-tea', 'peanut-syrup', 'choco-syrup'] },
+                    { description: 'В стакан добавить:', ingredientKeys: ['tapioca'] },
+                    { description: 'Перелить содержимое в стакан.', ingredientKeys: [] },
+                    { description: 'Украсить:', ingredientKeys: ['cheese-foam', 'peanuts'] }
+                ]
+            },
+            'hot-bubble-coffee': {
+                name: 'Бабл кофе (горячий)',
+                volumeType: 'single',
+                volume: '500 мл',
+                imageUrl: '',
+                allIngredients: {
+                    'tapioca': { name: 'Тапиока', quantity: '60гр' },
+                    'baked-milk': { name: 'Молоко топленое', quantity: '270мл' },
+                    'espresso': { name: 'Эспрессо', quantity: '36гр' },
+                    'cane-syrup': { name: 'Тростниковый сироп', quantity: '35гр' },
+                    'cheese-foam': { name: 'Сырная пенка', quantity: '70гр' },
+                    'choco-flakes': { name: 'Стружка шоколада', quantity: '1гр' }
                 },
-                {
-                    "description": "Украсить:",
-                    "ingredientKeys": [
-                        "cheese-foam",
-                        "oreo-crumbs"
-                    ]
-                }
-            ]
+                steps: [
+                    { description: 'Взбить в питчере до 65-70°С с минимальной пенкой:', ingredientKeys: ['baked-milk', 'cane-syrup'] },
+                    { description: 'В стакан добавить тапиоку и создать эффект "грязи".', ingredientKeys: ['tapioca'] },
+                    { description: 'Перелить содержимое питчера в стакан.', ingredientKeys: [] },
+                    { description: 'Аккуратно влить эспрессо.', ingredientKeys: ['espresso'] },
+                    { description: 'Украсить:', ingredientKeys: ['cheese-foam', 'choco-flakes'] }
+                ]
+            },
+            'hot-almond-mokka': {
+                name: 'Миндальный мокко (горячий)',
+                volumeType: 'single',
+                volume: '500 мл',
+                imageUrl: '',
+                allIngredients: {
+                    'tapioca': { name: 'Тапиока', quantity: '60гр' },
+                    'milk': { name: 'Молоко', quantity: '270гр' },
+                    'cocoa-base': { name: 'Основа какао', quantity: '10мл' },
+                    'almond-syrup': { name: 'Сироп миндальный', quantity: '25гр' },
+                    'espresso': { name: 'Эспрессо', quantity: '35гр' },
+                    'cheese-foam': { name: 'Сырная пенка', quantity: '70гр' }
+                },
+                steps: [
+                    { description: 'Взбить в питчере с минимальной пенкой:', ingredientKeys: ['milk', 'cocoa-base', 'almond-syrup'] },
+                    { description: 'В стакан добавить тапиоку и создать эффект "грязи".', ingredientKeys: ['tapioca'] },
+                    { description: 'Перелить содержимое питчера в стакан.', ingredientKeys: [] },
+                    { description: 'Аккуратно влить эспрессо.', ingredientKeys: ['espresso'] },
+                    { description: 'Украсить сырной пенкой и какао.', ingredientKeys: ['cheese-foam'] }
+                ]
+            },
+            'hot-matcha-mango': {
+                name: 'Матча Манго Кокос (горячий)',
+                volumeType: 'single',
+                volume: '500 мл',
+                imageUrl: '',
+                allIngredients: {
+                    'tapioca': { name: 'Тапиока', quantity: '60гр' },
+                    'milk': { name: 'Молоко', quantity: '270мл' },
+                    'mango-concentrate': { name: 'Концентрат манго', quantity: '20гр' },
+                    'coconut-syrup': { name: 'Сироп кокос', quantity: '30гр' },
+                    'matcha-prep': { name: 'Заготовка матчи', quantity: '35гр' },
+                    'cheese-foam': { name: 'Сырная пенка', quantity: '70гр' }
+                },
+                steps: [
+                    { description: 'Взбить в питчере до 65-70°С с минимальной пенкой:', ingredientKeys: ['milk', 'mango-concentrate', 'coconut-syrup'] },
+                    { description: 'В стакан добавить тапиоку и создать эффект "грязи".', ingredientKeys: ['tapioca'] },
+                    { description: 'Перелить содержимое питчера в стакан.', ingredientKeys: [] },
+                    { description: 'Аккуратно влить заготовку матчи.', ingredientKeys: ['matcha-prep'] },
+                    { description: 'Украсить сырной пенкой и кокосовой стружкой.', ingredientKeys: ['cheese-foam'] }
+                ]
+            },
+            'sea-buckthorn-tea': {
+                name: 'Облепиховый чай',
+                volumeType: 'single',
+                volume: '450 мл',
+                imageUrl: '',
+                allIngredients: {
+                    'base': { name: 'Основа', quantity: '50мл' },
+                    'seabuckthorn': { name: 'Ягода свежая "облепиха"', quantity: '10гр' },
+                    'cinnamon': { name: 'Корица 1шт', quantity: '4г' },
+                    'ginger': { name: 'Имбирь 2 слайса', quantity: '5гр' }
+                },
+                steps: [
+                    { description: 'Добавить в стакан и тщательно перемешать:', ingredientKeys: ['base', 'seabuckthorn', 'cinnamon', 'ginger'] },
+                    { description: 'Залить кипятком и перемешать.', ingredientKeys: [] }
+                ]
+            },
+            'mulled-wine-tea': {
+                name: 'Глинтвейн (б/а)',
+                volumeType: 'single',
+                volume: '450 мл',
+                imageUrl: '',
+                allIngredients: {
+                    'base': { name: 'Основа', quantity: '45мл' },
+                    'apple': { name: 'Яблоко 1 долька', quantity: '15гр' },
+                    'orange': { name: 'Апельсин 1 долька', quantity: '15гр' },
+                    'anise': { name: 'Бадьян 1шт', quantity: '1,5гр' },
+                    'clove': { name: 'Гвоздика 1шт', quantity: '1гр' },
+                    'cinnamon': { name: 'Корица 1шт', quantity: '4г' }
+                },
+                steps: [
+                    { description: 'Добавить в стакан:', ingredientKeys: ['base', 'apple', 'orange', 'anise', 'clove', 'cinnamon'] },
+                    { description: 'Залить кипятком и перемешать.', ingredientKeys: [] }
+                ]
+            },
+            // ... (Старые рецепты)
+            'oreo': {
+                name: 'Орео',
+                volumeType: 'dual',
+                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/oreo.jpg',
+                allIngredients: { 'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 'milk': { name: 'Молоко 3,2%', size500: '140', size650: '180' }, 'assam-tea': { name: 'Чай Ассам заготовка', size500: '50', size650: '75' }, 'condensed-milk': { name: 'Сгущеное молоко', size500: '25', size650: '30' }, 'cocoa-prep': { name: 'Какао заготовка', size500: '25', size650: '30' }, 'cane-syrup': { name: 'Тростниковый сироп', size500: '5', size650: '5' }, 'cheese-foam': { name: 'Сырная пенка', size500: '70', size650: '70' }, 'ice': { name: 'Лед', size500: '120', size650: '150' }, 'oreo-crumbs': { name: 'Крошка печенья Орео', size500: '', size650: '' } },
+                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['assam-tea', 'milk', 'condensed-milk', 'cocoa-prep'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca', 'ice', 'cane-syrup'] }, { description: 'Перелить содержимое шейкера в стакан.', ingredientKeys: [] }, { description: 'Украсить:', ingredientKeys: ['cheese-foam', 'oreo-crumbs'] } ]
+            },
+            'salted-caramel': {
+                name: 'Соленый крекер',
+                volumeType: 'dual',
+                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/solyoniy-kreker.jpg',
+                allIngredients: { 'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 'milk': { name: 'Молоко 3,2%', size500: '140', size650: '180' }, 'assam-tea': { name: 'Чай Ассам заготовка', size500: '50', size650: '75' }, 'caramel-topping': { name: 'Топпинг Соленая карамель', size500: '55', size650: '70' }, 'cane-syrup': { name: 'Тростниковый сироп', size500: '5', size650: '5' }, 'cheese-foam': { name: 'Сырная пенка', size500: '70', size650: '70' }, 'ice': { name: 'Лед', size500: '120', size650: '150' }, 'cracker-crumbs': { name: 'Крошка печенья "соленый крекер"', size500: '', size650: '' } },
+                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['milk', 'assam-tea', 'caramel-topping'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca', 'ice', 'cane-syrup'] }, { description: 'Перелить содержимое шейкера в стакан.', ingredientKeys: [] }, { description: 'Украсить:', ingredientKeys: ['cheese-foam', 'cracker-crumbs'] } ]
+            },
+            'matcha-coconut': {
+                name: 'Зеленая матча кокос',
+                volumeType: 'dual',
+                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/zelyonaya-matcha-kokos.jpg',
+                allIngredients: { 'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 'milk': { name: 'Молоко', size500: '140', size650: '180' }, 'matcha-prep': { name: 'Матча Заготовка', size500: '35', size650: '45' }, 'coconut-concentrate': { name: 'Концентрат кокос', size500: '20', size650: '25' }, 'cheese-foam': { name: 'Сырная пенка', size500: '70', size650: '70' }, 'ice': { name: 'Лед', size500: '120', size650: '150' }, 'cane-syrup': { name: 'Тростниковый сироп', size500: '5', size650: '5' }, 'matcha-powder': { name: 'Матча порошок', size500: '', size650: '' } },
+                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['milk', 'matcha-prep', 'coconut-concentrate'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca', 'ice', 'cane-syrup'] }, { description: 'Перелить содержимое в стакан.', ingredientKeys: [] }, { description: 'Украсить:', ingredientKeys: ['cheese-foam', 'matcha-powder'] } ]
+            },
+            'berry-mood': {
+                name: 'Ягодное настроение',
+                volumeType: 'dual',
+                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/yagodnoye-nastroenie.jpg',
+                allIngredients: { 'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 'assam-tea': { name: 'Чай ассам заготовка', size500: '50', size650: '75' }, 'milk': { name: 'Молоко 3,2%', size500: '140', size650: '180' }, 'raspberry-concentrate': { name: 'Концентрат Малина', size500: '25', size650: '30' }, 'blueberry-concentrate': { name: 'Концентрат Черника', size500: '25', size650: '30' }, 'cane-syrup': { name: 'Тростниковый сироп', size500: '5', size650: '5' }, 'ice': { name: 'Лед', size500: '120', size650: '150' }, 'cheese-foam': { name: 'Сырная пенка', size500: '70', size650: '70' }, 'berries-garnish': { name: 'Ягоды черники/малины', size500: '', size650: '' } },
+                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['assam-tea', 'milk', 'raspberry-concentrate', 'blueberry-concentrate'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca', 'ice', 'cane-syrup'] }, { description: 'Перелить содержимое шейкера в стакан.', ingredientKeys: [] }, { description: 'Украсить:', ingredientKeys: ['cheese-foam', 'berries-garnish'] } ]
+            },
+            'banana-ice-cream': {
+                name: 'Банановое мороженое',
+                volumeType: 'dual',
+                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/banan.jpg',
+                allIngredients: { 'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 'assam-tea': { name: 'Чай ассам заготовка', size500: '50', size650: '75' }, 'milk': { name: 'Молоко', size500: '140', size650: '180' }, 'banana-concentrate': { name: 'Концентрат Банан', size500: '35', size650: '40' }, 'condensed-milk': { name: 'Сгущеное молоко', size500: '25', size650: '30' }, 'ice': { name: 'Лед', size500: '120', size650: '150' }, 'cheese-foam': { name: 'Сырная пенка', size500: '70', size650: '70' } },
+                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['assam-tea', 'milk', 'banana-concentrate', 'condensed-milk'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca', 'ice'] }, { description: 'Перелить содержимое шейкера в стакан.', ingredientKeys: [] }, { description: 'Украсить:', ingredientKeys: ['cheese-foam'] } ]
+            },
+            'snickers': {
+                name: 'Сникерс (милкшейк)',
+                volumeType: 'dual',
+                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/snickers.jpg',
+                allIngredients: { 'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 'ice-cream': { name: 'Мороженое 15-20%', size500: '180', size650: '230' }, 'milk': { name: 'Молоко 3,2%', size500: '180', size650: '230' }, 'caramel-syrup': { name: 'Сироп/топинг карамель', size500: '20', size650: '30' }, 'nut-syrup': { name: 'Сироп лесной орех', size500: '10', size650: '20' }, 'peanuts': { name: 'Жареный Арахис', size500: '5', size650: '5' } },
+                steps: [ { description: 'В блендере взбить:', ingredientKeys: ['ice-cream', 'milk', 'caramel-syrup', 'nut-syrup'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca'] }, { description: 'Перелить содержимое блендера в стакан.', ingredientKeys: [] }, { description: 'Украсить:', ingredientKeys: ['peanuts'] } ]
+            },
+            'bounty': {
+                name: 'Баунти (милкшейк)',
+                volumeType: 'dual',
+                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/bounty.jpg',
+                allIngredients: { 'tapioca': { name: 'Тапиока', size500: '80', size650: '100' }, 'ice-cream': { name: 'Мороженое 15-20%', size500: '190', size650: '240' }, 'milk': { name: 'Молоко 3,2%', size500: '180', size650: '230' }, 'coconut-concentrate': { name: 'Концентрат Кокос', size500: '20', size650: '30' }, 'almond-syrup': { name: 'Сироп миндаль', size500: '10', size650: '20' }, 'coconut-flakes': { name: 'Кокосовая стружка', size500: '5', size650: '5' } },
+                steps: [ { description: 'В блендере взбить:', ingredientKeys: ['ice-cream', 'milk', 'coconut-concentrate', 'almond-syrup'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca'] }, { description: 'Перелить содержимое блендера в стакан.', ingredientKeys: [] }, { description: 'Украсить:', ingredientKeys: ['coconut-flakes'] } ]
+            },
+            'blueberry-strawberry': {
+                name: 'Черника-Клубника (милкшейк)',
+                volumeType: 'dual',
+                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/chernika-klubnika.jpg',
+                allIngredients: { 'tapioca-balls': { name: 'Тапиока/Джусболы', size500: '80', size650: '100' }, 'ice-cream': { name: 'Мороженое 15-20%', size500: '150', size650: '200' }, 'milk': { name: 'Молоко 3,2%', size500: '180', size650: '230' }, 'strawberry-puree': { name: 'Ягода(пюре) Клубника', size500: '20', size650: '30' }, 'blueberry-puree': { name: 'Ягода(пюре) Черника', size500: '20', size650: '30' }, 'strawberry-topping': { name: 'Топинг клубника', size500: '20', size650: '30' } },
+                steps: [ { description: 'В блендере взбить:', ingredientKeys: ['ice-cream', 'milk', 'strawberry-puree', 'blueberry-puree', 'strawberry-topping'] }, { description: 'В стакан добавить:', ingredientKeys: ['tapioca-balls'] }, { description: 'Перелить содержимое блендера в стакан.', ingredientKeys: [] } ]
+            },
+            'lemonade-raspberry-pomegranate': {
+                name: 'Лимонад Малина-Гранат',
+                volumeType: 'dual',
+                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/limonad-malina-granat.jpg',
+                allIngredients: { 'juice-balls': { name: 'Джус боллы', size500: '60', size650: '80' }, 'sparkling-water': { name: 'Газированная Вода', size500: '225', size650: '275' }, 'raspberry-concentrate': { name: 'Концентрат Малина', size500: '40', size650: '35' }, 'berries': { name: 'Ягода малина,гранат', size500: '10/10', size650: '15/15' }, 'ice': { name: 'Лед', size500: '150', size650: '200' }, 'grenadine': { name: 'Сироп Гренадин', size500: '20', size650: '35' } },
+                steps: [ { description: 'В питчере смешать (ложкой):', ingredientKeys: ['raspberry-concentrate', 'grenadine', 'berries', 'sparkling-water'] }, { description: 'В стакан добавить:', ingredientKeys: ['juice-balls', 'ice'] }, { description: 'Перелить содержимое в стакан.', ingredientKeys: [] } ]
+            },
+            'lemonade-mango-passion': {
+                name: 'Лимонад Манго-Маракуйя',
+                volumeType: 'dual',
+                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/limonad-mango-marakuya.jpg',
+                allIngredients: { 'juice-balls': { name: 'Джус боллы', size500: '60', size650: '80' }, 'sparkling-water': { name: 'Газированная Вода', size500: '225', size650: '275' }, 'mango-passion-concentrate': { name: 'Концентрат Манго-Маракуйя', size500: '60', size650: '80' }, 'mango-pieces': { name: 'Манго свежее кусочки', size500: '20', size650: '30' }, 'ice': { name: 'Лед', size500: '150', size650: '200' } },
+                steps: [ { description: 'В питчере смешать (ложкой):', ingredientKeys: ['mango-passion-concentrate', 'mango-pieces', 'sparkling-water'] }, { description: 'В стакан добавить:', ingredientKeys: ['juice-balls', 'ice'] }, { description: 'Перелить содержимое в стакан.', ingredientKeys: [] } ]
+            },
+            'lemonade-pear-kiwi': {
+                name: 'Лимонад Груша-Киви',
+                volumeType: 'dual',
+                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/limonad-grusha-kivi.jpg',
+                allIngredients: { 'juice-balls': { name: 'Джус боллы', size500: '60', size650: '80' }, 'sparkling-water': { name: 'Газированная Вода', size500: '225', size650: '275' }, 'pear-concentrate': { name: 'Концентрат Груша', size500: '40', size650: '50' }, 'kiwi-concentrate': { name: 'Концентрат Киви', size500: '20', size650: '25' }, 'kiwi-fresh': { name: 'Киви свежий', size500: '20', size650: '30' }, 'ice': { name: 'Лед', size500: '150', size650: '200' } },
+                steps: [ { description: 'В питчере смешать (ложкой):', ingredientKeys: ['pear-concentrate', 'kiwi-concentrate', 'sparkling-water'] }, { description: 'В стакан добавить:', ingredientKeys: ['juice-balls', 'kiwi-fresh', 'ice'] }, { description: 'Перелить содержимое в стакан.', ingredientKeys: [] } ]
+            },
+            'lemonade-pineapple-peach': {
+                name: 'Лимонад Ананас-Персик',
+                volumeType: 'dual',
+                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/limonad-ananas-persik.jpg',
+                allIngredients: { 'juice-balls': { name: 'Джус боллы', size500: '60', size650: '80' }, 'sparkling-water': { name: 'Газированная Вода', size500: '225', size650: '275' }, 'pineapple-concentrate': { name: 'Концентрат Ананас', size500: '40', size650: '50' }, 'peach-concentrate': { name: 'Концентрат Персик', size500: '20', size650: '25' }, 'ice': { name: 'Лед', size500: '150', size650: '200' } },
+                steps: [ { description: 'В питчере смешать (ложкой):', ingredientKeys: ['pineapple-concentrate', 'peach-concentrate', 'sparkling-water'] }, { description: 'В стакан добавить:', ingredientKeys: ['juice-balls', 'ice'] }, { description: 'Перелить содержимое в стакан.', ingredientKeys: [] } ]
+            },
+            'tea-raspberry-pomegranate': {
+                name: 'Джус боллы Малина-Гранат',
+                volumeType: 'dual',
+                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/balls-malina-granat.jpg',
+                allIngredients: { 'juice-balls': { name: 'Джус боллы', size500: '60', size650: '80' }, 'green-tea': { name: 'Чай зеленый с жасмином', size500: '100', size650: '125' }, 'water': { name: 'Вода', size500: '125', size650: '150' }, 'raspberry-concentrate': { name: 'Концентрат Малина', size500: '40', size650: '50' }, 'berries': { name: 'Ягода малина,гранат', size500: '10/10', size650: '15/15' }, 'grenadine': { name: 'Сироп Гренадин', size500: '20', size650: '25' }, 'ice': { name: 'Лед', size500: '120', size650: '150' } },
+                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['green-tea', 'water', 'raspberry-concentrate', 'grenadine', 'berries'] }, { description: 'В стакан добавить:', ingredientKeys: ['juice-balls', 'ice'] }, { description: 'Перелить содержимое шейкера в стакан.', ingredientKeys: [] } ]
+            },
+            'tea-mango-passion': {
+                name: 'Джус боллы Манго-Маракуйя',
+                volumeType: 'dual',
+                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/balls-mango-marakuya.jpg',
+                allIngredients: { 'juice-balls': { name: 'Джус боллы', size500: '60', size650: '80' }, 'green-tea': { name: 'Чай зеленый с жасмином', size500: '120', size650: '150' }, 'water': { name: 'Вода', size500: '100', size650: '120' }, 'mango-passion-concentrate': { name: 'Концентрат Манго-Маракуйя', size500: '60', size650: '80' }, 'mango-pieces': { name: 'Манго свежее кусочки', size500: '20', size650: '30' }, 'ice': { name: 'Лед', size500: '120', size650: '150' } },
+                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['green-tea', 'water', 'mango-passion-concentrate', 'mango-pieces'] }, { description: 'В стакан добавить:', ingredientKeys: ['juice-balls', 'ice'] }, { description: 'Перелить содержимое шейкера в стакан.', ingredientKeys: [] } ]
+            },
+            'tea-pear-kiwi': {
+                name: 'Джус боллы Груша-Киви',
+                volumeType: 'dual',
+                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/balls-grusha-kivi.jpg',
+                allIngredients: { 'juice-balls': { name: 'Джус боллы', size500: '60', size650: '80' }, 'green-tea': { name: 'Чай зеленый с жасмином', size500: '120', size650: '150' }, 'water': { name: 'Вода', size500: '100', size650: '120' }, 'pear-concentrate': { name: 'Концентрат Груша', size500: '40', size650: '50' }, 'kiwi-concentrate': { name: 'Концентрат Киви', size500: '20', size650: '25' }, 'kiwi-fresh': { name: 'Киви свежий', size500: '20', size650: '30' }, 'ice': { name: 'Лед', size500: '120', size650: '150' } },
+                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['green-tea', 'water', 'pear-concentrate', 'kiwi-concentrate'] }, { description: 'В стакан добавить:', ingredientKeys: ['juice-balls', 'kiwi-fresh', 'ice'] }, { description: 'Перелить содержимое шейкера в стакан.', ingredientKeys: [] } ]
+            },
+            'tea-pineapple-peach': {
+                name: 'Джус боллы Ананас-Персик',
+                volumeType: 'dual',
+                imageUrl: 'https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/balls-ananas-persik.jpg',
+                allIngredients: { 'juice-balls': { name: 'Джус боллы', size500: '60', size650: '80' }, 'green-tea': { name: 'Чай зеленый с жасмином', size500: '120', size650: '150' }, 'water': { name: 'Вода', size500: '100', size650: '120' }, 'pineapple-concentrate': { name: 'Концентрат Ананас', size500: '40', size650: '50' }, 'peach-concentrate': { name: 'Концентрат Персик', size500: '20', size650: '25' }, 'ice': { name: 'Лед', size500: '120', size650: '150' } },
+                steps: [ { description: 'В шейкере смешать:', ingredientKeys: ['green-tea', 'water', 'pineapple-concentrate', 'peach-concentrate'] }, { description: 'В стакан добавить:', ingredientKeys: ['juice-balls', 'ice'] }, { description: 'Перелить содержимое шейкера в стакан.', ingredientKeys: [] } ]
+            }
         },
-        "salted-caramel": {
-            "name": "Соленый крекер",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/solyoniy-kreker.jpg",
-            "allIngredients": {
-                "milk": {
-                    "name": "Молоко 3,2%",
-                    "size500": "140",
-                    "size650": "180"
-                },
-                "assam-tea": {
-                    "name": "Чай Ассам (заготовка)",
-                    "size500": "50",
-                    "size650": "75"
-                },
-                "caramel-topping": {
-                    "name": "Концентрат Солёная карамель",
-                    "size500": "55",
-                    "size650": "70"
-                },
-                "tapioca": {
-                    "name": "Тапиока",
-                    "size500": "80",
-                    "size650": "100"
-                },
-                "ice": {
-                    "name": "Лёд",
-                    "size500": "120",
-                    "size650": "150"
-                },
-                "cane-syrup": {
-                    "name": "Тростниковый сироп",
-                    "size500": "5",
-                    "size650": "5"
-                },
-                "cheese-foam": {
-                    "name": "Сырная пенка",
-                    "size500": "70",
-                    "size650": "70"
-                },
-                "cracker-crumbs": {
-                    "name": "Крошка печенья",
-                    "size500": "",
-                    "size650": ""
-                }
-            },
-            "steps": [
-                {
-                    "description": "В шейкере смешать:",
-                    "ingredientKeys": [
-                        "milk",
-                        "assam-tea",
-                        "caramel-topping"
-                    ]
-                },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "tapioca",
-                        "ice",
-                        "cane-syrup"
-                    ]
-                },
-                {
-                    "description": "Перелить содержимое шейкера в стакан.",
-                    "ingredientKeys": []
-                },
-                {
-                    "description": "Украсить:",
-                    "ingredientKeys": [
-                        "cheese-foam",
-                        "cracker-crumbs"
-                    ]
-                }
-            ]
-        },
-        "cocoa": {
-            "name": "Какао",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/kakao.jpg",
-            "allIngredients": {
-                "milk": {
-                    "name": "Молоко 3,2%",
-                    "size500": "140",
-                    "size650": "180"
-                },
-                "cocoa-prep": {
-                    "name": "Какао (заготовка)",
-                    "size500": "35",
-                    "size650": "45"
-                },
-                "cane-syrup": {
-                    "name": "Тростниковый сироп",
-                    "size500": "20",
-                    "size650": "25"
-                },
-                "tapioca": {
-                    "name": "Тапиока",
-                    "size500": "80",
-                    "size650": "100"
-                },
-                "ice": {
-                    "name": "Лёд",
-                    "size500": "120",
-                    "size650": "150"
-                },
-                "cheese-foam": {
-                    "name": "Сырная пенка",
-                    "size500": "70",
-                    "size650": "70"
-                },
-                "cocoa-powder": {
-                    "name": "Какао порошок (для посыпки)",
-                    "size500": "",
-                    "size650": ""
-                }
-            },
-            "steps": [
-                {
-                    "description": "В шейкере смешать:",
-                    "ingredientKeys": [
-                        "milk",
-                        "cocoa-prep",
-                        "cane-syrup"
-                    ]
-                },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "tapioca",
-                        "ice"
-                    ]
-                },
-                {
-                    "description": "Перелить содержимое в стакан.",
-                    "ingredientKeys": []
-                },
-                {
-                    "description": "Украсить:",
-                    "ingredientKeys": [
-                        "cheese-foam",
-                        "cocoa-powder"
-                    ]
-                }
-            ]
-        },
-        "matcha-coconut": {
-            "name": "Зеленая матча кокос",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/zelyonaya-matcha-kokos.jpg",
-            "allIngredients": {
-                "milk": {
-                    "name": "Молоко 3,2%",
-                    "size500": "140",
-                    "size650": "180"
-                },
-                "matcha-prep": {
-                    "name": "Матча (заготовка)",
-                    "size500": "35",
-                    "size650": "45"
-                },
-                "coconut-concentrate": {
-                    "name": "Концентрат Кокос",
-                    "size500": "20",
-                    "size650": "25"
-                },
-                "tapioca": {
-                    "name": "Тапиока",
-                    "size500": "80",
-                    "size650": "100"
-                },
-                "ice": {
-                    "name": "Лёд",
-                    "size500": "120",
-                    "size650": "150"
-                },
-                "cane-syrup": {
-                    "name": "Тростниковый сироп",
-                    "size500": "5",
-                    "size650": "5"
-                },
-                "cheese-foam": {
-                    "name": "Сырная пенка",
-                    "size500": "70",
-                    "size650": "70"
-                },
-                "matcha-powder": {
-                    "name": "Матча порошок",
-                    "size500": "",
-                    "size650": ""
-                }
-            },
-            "steps": [
-                {
-                    "description": "В шейкере смешать:",
-                    "ingredientKeys": [
-                        "milk",
-                        "matcha-prep",
-                        "coconut-concentrate"
-                    ]
-                },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "tapioca",
-                        "ice",
-                        "cane-syrup"
-                    ]
-                },
-                {
-                    "description": "Перелить содержимое в стакан.",
-                    "ingredientKeys": []
-                },
-                {
-                    "description": "Украсить:",
-                    "ingredientKeys": [
-                        "cheese-foam",
-                        "matcha-powder"
-                    ]
-                }
-            ]
-        },
-        "berry-mood": {
-            "name": "Ягодное настроение",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/yagodnoye-nastroenie.jpg",
-            "allIngredients": {
-                "assam-tea": {
-                    "name": "Чай Ассам (заготовка)",
-                    "size500": "50",
-                    "size650": "75"
-                },
-                "milk": {
-                    "name": "Молоко 3,2%",
-                    "size500": "140",
-                    "size650": "180"
-                },
-                "raspberry-concentrate": {
-                    "name": "Концентрат Малина",
-                    "size500": "25",
-                    "size650": "30"
-                },
-                "blueberry-concentrate": {
-                    "name": "Концентрат Черника",
-                    "size500": "25",
-                    "size650": "30"
-                },
-                "tapioca": {
-                    "name": "Тапиока",
-                    "size500": "80",
-                    "size650": "100"
-                },
-                "ice": {
-                    "name": "Лёд",
-                    "size500": "120",
-                    "size650": "150"
-                },
-                "cane-syrup": {
-                    "name": "Тростниковый сироп",
-                    "size500": "5",
-                    "size650": "5"
-                },
-                "cheese-foam": {
-                    "name": "Сырная пенка",
-                    "size500": "70",
-                    "size650": "70"
-                }
-            },
-            "steps": [
-                {
-                    "description": "В шейкере смешать:",
-                    "ingredientKeys": [
-                        "assam-tea",
-                        "milk",
-                        "raspberry-concentrate",
-                        "blueberry-concentrate"
-                    ]
-                },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "tapioca",
-                        "ice",
-                        "cane-syrup"
-                    ]
-                },
-                {
-                    "description": "Перелить содержимое шейкера в стакан.",
-                    "ingredientKeys": []
-                },
-                {
-                    "description": "Украсить:",
-                    "ingredientKeys": [
-                        "cheese-foam"
-                    ]
-                }
-            ]
-        },
-        "banana-ice-cream": {
-            "name": "Банановое мороженое",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/banan.jpg",
-            "allIngredients": {
-                "assam-tea": {
-                    "name": "Чай Ассам (заготовка)",
-                    "size500": "50",
-                    "size650": "75"
-                },
-                "milk": {
-                    "name": "Молоко 3,2%",
-                    "size500": "140",
-                    "size650": "180"
-                },
-                "condensed-milk": {
-                    "name": "Сгущёное молоко",
-                    "size500": "25",
-                    "size650": "30"
-                },
-                "banana-concentrate": {
-                    "name": "Концентрат Банан",
-                    "size500": "35",
-                    "size650": "40"
-                },
-                "tapioca": {
-                    "name": "Тапиока",
-                    "size500": "80",
-                    "size650": "100"
-                },
-                "ice": {
-                    "name": "Лёд",
-                    "size500": "120",
-                    "size650": "150"
-                },
-                "cheese-foam": {
-                    "name": "Сырная пенка",
-                    "size500": "70",
-                    "size650": "70"
-                }
-            },
-            "steps": [
-                {
-                    "description": "В шейкере смешать:",
-                    "ingredientKeys": [
-                        "assam-tea",
-                        "milk",
-                        "condensed-milk",
-                        "banana-concentrate"
-                    ]
-                },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "tapioca",
-                        "ice"
-                    ]
-                },
-                {
-                    "description": "Перелить содержимое шейкера в стакан.",
-                    "ingredientKeys": []
-                },
-                {
-                    "description": "Украсить:",
-                    "ingredientKeys": [
-                        "cheese-foam"
-                    ]
-                }
-            ]
-        },
-        "snickers": {
-            "name": "Сникерс (милкшейк)",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/snickers.jpg",
-            "allIngredients": {
-                "tapioca": {
-                    "name": "Тапиока",
-                    "size500": "80",
-                    "size650": "100"
-                },
-                "ice-cream": {
-                    "name": "Мороженое 15-20%",
-                    "size500": "180",
-                    "size650": "230"
-                },
-                "milk": {
-                    "name": "Молоко 3,2%",
-                    "size500": "180",
-                    "size650": "230"
-                },
-                "caramel-syrup": {
-                    "name": "Концентрат Солёная карамель",
-                    "size500": "20",
-                    "size650": "30"
-                },
-                "nut-syrup": {
-                    "name": "Сироп Лесной орех",
-                    "size500": "10",
-                    "size650": "20"
-                },
-                "peanuts": {
-                    "name": "Жареный Арахис",
-                    "size500": "5",
-                    "size650": "5"
-                }
-            },
-            "steps": [
-                {
-                    "description": "В блендере взбить:",
-                    "ingredientKeys": [
-                        "ice-cream",
-                        "milk",
-                        "caramel-syrup",
-                        "nut-syrup"
-                    ]
-                },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "tapioca"
-                    ]
-                },
-                {
-                    "description": "Перелить содержимое блендера в стакан.",
-                    "ingredientKeys": []
-                },
-                {
-                    "description": "Украсить:",
-                    "ingredientKeys": [
-                        "peanuts"
-                    ]
-                }
-            ]
-        },
-        "bounty": {
-            "name": "Баунти (милкшейк)",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/bounty.jpg",
-            "allIngredients": {
-                "tapioca": {
-                    "name": "Тапиока",
-                    "size500": "80",
-                    "size650": "100"
-                },
-                "ice-cream": {
-                    "name": "Мороженое 15-20%",
-                    "size500": "190",
-                    "size650": "240"
-                },
-                "milk": {
-                    "name": "Молоко 3,2%",
-                    "size500": "180",
-                    "size650": "230"
-                },
-                "coconut-concentrate": {
-                    "name": "Концентрат Кокос",
-                    "size500": "20",
-                    "size650": "30"
-                },
-                "almond-syrup": {
-                    "name": "Сироп Миндаль",
-                    "size500": "10",
-                    "size650": "20"
-                },
-                "coconut-flakes": {
-                    "name": "Кокосовая стружка",
-                    "size500": "5",
-                    "size650": "5"
-                }
-            },
-            "steps": [
-                {
-                    "description": "В блендере взбить:",
-                    "ingredientKeys": [
-                        "ice-cream",
-                        "milk",
-                        "coconut-concentrate",
-                        "almond-syrup"
-                    ]
-                },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "tapioca"
-                    ]
-                },
-                {
-                    "description": "Перелить содержимое блендера в стакан.",
-                    "ingredientKeys": []
-                },
-                {
-                    "description": "Украсить:",
-                    "ingredientKeys": [
-                        "coconut-flakes"
-                    ]
-                }
-            ]
-        },
-        "blueberry-strawberry": {
-            "name": "Черника-Клубника (милкшейк)",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/chernika-klubnika.jpg",
-            "allIngredients": {
-                "ice-cream": {
-                    "name": "Мороженое 15-20%",
-                    "size500": "150",
-                    "size650": "200"
-                },
-                "milk": {
-                    "name": "Молоко 3,2%",
-                    "size500": "180",
-                    "size650": "230"
-                },
-                "strawberry-puree": {
-                    "name": "Ягода Клубника",
-                    "size500": "20",
-                    "size650": "30"
-                },
-                "blueberry-puree": {
-                    "name": "Ягода Черника",
-                    "size500": "20",
-                    "size650": "30"
-                },
-                "strawberry-topping": {
-                    "name": "Концентрат Клубника",
-                    "size500": "20",
-                    "size650": "30"
-                },
-                "blueberry-topping": {
-                    "name": "Концентрат Черника",
-                    "size500": "20",
-                    "size650": "30"
-                },
-                "tapioca-balls": {
-                    "name": "Джус боллы (фиолетовые)",
-                    "size500": "80",
-                    "size650": "100"
-                }
-            },
-            "steps": [
-                {
-                    "description": "В блендере взбить:",
-                    "ingredientKeys": [
-                        "ice-cream",
-                        "milk",
-                        "strawberry-puree",
-                        "blueberry-puree",
-                        "strawberry-topping",
-                        "blueberry-topping"
-                    ]
-                },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "tapioca-balls"
-                    ]
-                },
-                {
-                    "description": "Перелить содержимое блендера в стакан.",
-                    "ingredientKeys": []
-                }
-            ]
-        },
-        "lemonade-raspberry-pomegranate": {
-            "name": "Лимонад Малина-Гранат",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/limonad-malina-granat.jpg",
-            "allIngredients": {
-                "juice-balls": {
-                    "name": "Джус боллы",
-                    "size500": "60",
-                    "size650": "80"
-                },
-                "sparkling-water": {
-                    "name": "Газированная вода",
-                    "size500": "225",
-                    "size650": "275"
-                },
-                "raspberry-concentrate": {
-                    "name": "Концентрат Малина",
-                    "size500": "40",
-                    "size650": "35"
-                },
-                "berries": {
-                    "name": "Ягода Малина, Гранат",
-                    "size500": "10/10",
-                    "size650": "15/15"
-                },
-                "ice": {
-                    "name": "Лёд",
-                    "size500": "150",
-                    "size650": "200"
-                },
-                "grenadine": {
-                    "name": "Сироп Гренадин",
-                    "size500": "20",
-                    "size650": "35"
-                }
-            },
-            "steps": [
-                {
-                    "description": "В шейкере смешать (ложкой):",
-                    "ingredientKeys": [
-                        "raspberry-concentrate",
-                        "grenadine",
-                        "berries",
-                        "sparkling-water"
-                    ]
-                },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "juice-balls",
-                        "ice"
-                    ]
-                },
-                {
-                    "description": "Перелить содержимое в стакан.",
-                    "ingredientKeys": []
-                }
-            ]
-        },
-        "lemonade-mango-passion": {
-            "name": "Лимонад Манго-Маракуйя",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/limonad-mango-marakuya.jpg",
-            "allIngredients": {
-                "juice-balls": {
-                    "name": "Джус боллы",
-                    "size500": "60",
-                    "size650": "80"
-                },
-                "sparkling-water": {
-                    "name": "Газированная вода",
-                    "size500": "225",
-                    "size650": "275"
-                },
-                "mango-passion-concentrate": {
-                    "name": "Концентрат Манго-Маракуйя",
-                    "size500": "60",
-                    "size650": "80"
-                },
-                "mango-pieces": {
-                    "name": "Манго свежее кусочки",
-                    "size500": "20",
-                    "size650": "30"
-                },
-                "ice": {
-                    "name": "Лёд",
-                    "size500": "150",
-                    "size650": "200"
-                }
-            },
-            "steps": [
-                {
-                    "description": "В шейкере смешать (ложкой):",
-                    "ingredientKeys": [
-                        "mango-passion-concentrate",
-                        "mango-pieces",
-                        "sparkling-water"
-                    ]
-                },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "juice-balls",
-                        "ice"
-                    ]
-                },
-                {
-                    "description": "Перелить содержимое в стакан.",
-                    "ingredientKeys": []
-                }
-            ]
-        },
-        "lemonade-pear-kiwi": {
-            "name": "Лимонад Груша-Киви",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/limonad-grusha-kivi.jpg",
-            "allIngredients": {
-                "juice-balls": {
-                    "name": "Джус боллы",
-                    "size500": "60",
-                    "size650": "80"
-                },
-                "sparkling-water": {
-                    "name": "Газированная вода",
-                    "size500": "225",
-                    "size650": "275"
-                },
-                "pear-concentrate": {
-                    "name": "Концентрат Груша",
-                    "size500": "40",
-                    "size650": "50"
-                },
-                "kiwi-concentrate": {
-                    "name": "Концентрат Киви",
-                    "size500": "20",
-                    "size650": "25"
-                },
-                "kiwi-fresh": {
-                    "name": "Киви свежий",
-                    "size500": "20",
-                    "size650": "30"
-                },
-                "ice": {
-                    "name": "Лёд",
-                    "size500": "150",
-                    "size650": "200"
-                }
-            },
-            "steps": [
-                {
-                    "description": "В шейкере смешать (ложкой):",
-                    "ingredientKeys": [
-                        "pear-concentrate",
-                        "kiwi-concentrate",
-                        "sparkling-water"
-                    ]
-                },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "juice-balls",
-                        "kiwi-fresh",
-                        "ice"
-                    ]
-                },
-                {
-                    "description": "Перелить содержимое в стакан.",
-                    "ingredientKeys": []
-                }
-            ]
-        },
-        "lemonade-pineapple-peach": {
-            "name": "Лимонад Ананас-Персик",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/limonad-ananas-persik.jpg",
-            "allIngredients": {
-                "juice-balls": {
-                    "name": "Джус боллы",
-                    "size500": "60",
-                    "size650": "80"
-                },
-                "sparkling-water": {
-                    "name": "Газированная вода",
-                    "size500": "225",
-                    "size650": "275"
-                },
-                "pineapple-concentrate": {
-                    "name": "Концентрат Ананас",
-                    "size500": "40",
-                    "size650": "50"
-                },
-                "peach-concentrate": {
-                    "name": "Концентрат Персик",
-                    "size500": "20",
-                    "size650": "25"
-                },
-                "ice": {
-                    "name": "Лёд",
-                    "size500": "150",
-                    "size650": "200"
-                }
-            },
-            "steps": [
-                {
-                    "description": "В шейкере смешать (ложкой):",
-                    "ingredientKeys": [
-                        "pineapple-concentrate",
-                        "peach-concentrate",
-                        "sparkling-water"
-                    ]
-                },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "juice-balls",
-                        "ice"
-                    ]
-                },
-                {
-                    "description": "Перелить содержимое в стакан.",
-                    "ingredientKeys": []
-                }
-            ]
-        },
-        "tea-raspberry-pomegranate": {
-            "name": "Джус боллы Малина-Гранат",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/balls-malina-granat.jpg",
-            "allIngredients": {
-                "juice-balls": {
-                    "name": "Джус боллы",
-                    "size500": "60",
-                    "size650": "80"
-                },
-                "green-tea": {
-                    "name": "Чай зеленый с жасмином (заготовка)",
-                    "size500": "100",
-                    "size650": "125"
-                },
-                "water": {
-                    "name": "Вода",
-                    "size500": "125",
-                    "size650": "150"
-                },
-                "raspberry-concentrate": {
-                    "name": "Концентрат Малина",
-                    "size500": "40",
-                    "size650": "50"
-                },
-                "berries": {
-                    "name": "Ягода малина, гранат",
-                    "size500": "10/10",
-                    "size650": "15/15"
-                },
-                "grenadine": {
-                    "name": "Сироп Гренадин",
-                    "size500": "20",
-                    "size650": "25"
-                },
-                "ice": {
-                    "name": "Лёд",
-                    "size500": "120",
-                    "size650": "150"
-                }
-            },
-            "steps": [
-                {
-                    "description": "В шейкере смешать:",
-                    "ingredientKeys": [
-                        "green-tea",
-                        "water",
-                        "raspberry-concentrate",
-                        "grenadine",
-                        "berries"
-                    ]
-                },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "juice-balls",
-                        "ice"
-                    ]
-                },
-                {
-                    "description": "Перелить содержимое шейкера в стакан.",
-                    "ingredientKeys": []
-                }
-            ]
-        },
-        "tea-mango-passion": {
-            "name": "Джус боллы Манго-Маракуйя",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/balls-mango-marakuya.jpg",
-            "allIngredients": {
-                "juice-balls": {
-                    "name": "Джус боллы",
-                    "size500": "60",
-                    "size650": "80"
-                },
-                "green-tea": {
-                    "name": "Чай зеленый с жасмином (заготовка)",
-                    "size500": "120",
-                    "size650": "150"
-                },
-                "water": {
-                    "name": "Вода",
-                    "size500": "100",
-                    "size650": "120"
-                },
-                "mango-passion-concentrate": {
-                    "name": "Концентрат Манго-Маракуйя",
-                    "size500": "60",
-                    "size650": "80"
-                },
-                "mango-pieces": {
-                    "name": "Манго свежее кусочки",
-                    "size500": "20",
-                    "size650": "30"
-                },
-                "ice": {
-                    "name": "Лёд",
-                    "size500": "120",
-                    "size650": "150"
-                }
-            },
-            "steps": [
-                {
-                    "description": "В шейкере смешать:",
-                    "ingredientKeys": [
-                        "green-tea",
-                        "water",
-                        "mango-passion-concentrate",
-                        "mango-pieces"
-                    ]
-                },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "juice-balls",
-                        "ice"
-                    ]
-                },
-                {
-                    "description": "Перелить содержимое шейкера в стакан.",
-                    "ingredientKeys": []
-                }
-            ]
-        },
-        "tea-pear-kiwi": {
-            "name": "Джус боллы Груша-Киви",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/balls-grusha-kivi.jpg",
-            "allIngredients": {
-                "juice-balls": {
-                    "name": "Джус боллы",
-                    "size500": "60",
-                    "size650": "80"
-                },
-                "green-tea": {
-                    "name": "Чай зеленый с жасмином (заготовка)",
-                    "size500": "120",
-                    "size650": "150"
-                },
-                "water": {
-                    "name": "Вода",
-                    "size500": "100",
-                    "size650": "120"
-                },
-                "pear-concentrate": {
-                    "name": "Концентрат Груша",
-                    "size500": "40",
-                    "size650": "50"
-                },
-                "kiwi-concentrate": {
-                    "name": "Концентрат Киви",
-                    "size500": "20",
-                    "size650": "25"
-                },
-                "kiwi-fresh": {
-                    "name": "Киви свежий",
-                    "size500": "20",
-                    "size650": "30"
-                },
-                "ice": {
-                    "name": "Лёд",
-                    "size500": "120",
-                    "size650": "150"
-                }
-            },
-            "steps": [
-                {
-                    "description": "В шейкере смешать:",
-                    "ingredientKeys": [
-                        "green-tea",
-                        "water",
-                        "pear-concentrate",
-                        "kiwi-concentrate"
-                    ]
-                },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "juice-balls",
-                        "kiwi-fresh",
-                        "ice"
-                    ]
-                },
-                {
-                    "description": "Перелить содержимое шейкера в стакан.",
-                    "ingredientKeys": []
-                }
-            ]
-        },
-        "tea-pineapple-peach": {
-            "name": "Джус боллы Ананас-Персик",
-            "imageUrl": "https://raw.githubusercontent.com/dtorkin/bubble-street/refs/heads/main/photo/balls-ananas-persik.jpg",
-            "allIngredients": {
-                "juice-balls": {
-                    "name": "Джус боллы",
-                    "size500": "60",
-                    "size650": "80"
-                },
-                "green-tea": {
-                    "name": "Чай зеленый с жасмином (заготовка)",
-                    "size500": "120",
-                    "size650": "150"
-                },
-                "water": {
-                    "name": "Вода",
-                    "size500": "100",
-                    "size650": "120"
-                },
-                "pineapple-concentrate": {
-                    "name": "Концентрат Ананас",
-                    "size500": "40",
-                    "size650": "50"
-                },
-                "peach-concentrate": {
-                    "name": "Концентрат Персик",
-                    "size500": "20",
-                    "size650": "25"
-                },
-                "ice": {
-                    "name": "Лёд",
-                    "size500": "120",
-                    "size650": "150"
-                }
-            },
-            "steps": [
-                {
-                    "description": "В шейкере смешать:",
-                    "ingredientKeys": [
-                        "green-tea",
-                        "water",
-                        "pineapple-concentrate",
-                        "peach-concentrate"
-                    ]
-                },
-                {
-                    "description": "В стакан добавить:",
-                    "ingredientKeys": [
-                        "juice-balls",
-                        "ice"
-                    ]
-                },
-                {
-                    "description": "Перелить содержимое шейкера в стакан.",
-                    "ingredientKeys": []
-                }
-            ]
+        preparations: {
+            'cocoa-prep': { name: 'Какао заготовка', description: 'В питчере тщательно смешать 10 грамм какао-порошка и 100 мл горячей воды до полного растворения.' },
+            'assam-tea': { name: 'Чай Ассам заготовка', description: '25 грамм чая "Ассам" заварить в 1 литре воды (95°C) в течение 10 минут, затем процедить.' },
+            'jasmine-green-tea': { name: 'Чай зеленый с жасмином заготовка', description: '20 грамм зеленого чая с жасмином заварить в 1 литре воды (80°C) в течение 5-7 минут, затем процедить.' }
         }
-    },
-    "preparations": {
-        "cocoa-prep": {
-            "name": "Какао заготовка",
-            "description": "В питчере тщательно смешать 10 грамм какао-порошка и 100 мл горячей воды до полного растворения."
-        },
-        "assam-tea": {
-            "name": "Чай Ассам (заготовка)",
-            "description": "25 грамм чая \"Ассам\" заварить в 1 литре воды (95°C) в течение 10 минут, затем процедить."
-        },
-        "jasmine-green-tea": {
-            "name": "Чай зеленый с жасмином (заготовка) заготовка",
-            "description": "20 грамм зеленого чая с жасмином заварить в 1 литре воды (80°C) в течение 5-7 минут, затем процедить."
-        }
-    }
-};
+    };
     
     // =======================================================================
-    // ОСНОВНАЯ ЛОГИКА ПРИЛОЖЕНИЯ
+    // ОСНОВНАЯ ЛОГИКА ПРИЛОЖЕНИЯ (Переписано на ES5 для совместимости)
     // =======================================================================
-    let appData = {};
-    let activeKey = null;
-    let selectedVolume = null;
-    let activeTab = 'drinks';
-    let sortableInstances = [];
-    let adminClickCount = 0;
-    let adminClickTimer = null;
+    var appData = {};
+    var activeKey = null;
+    var selectedVolume = null;
+    var activeTab = 'drinks';
+    var sortableInstances = [];
+    var adminClickCount = 0;
+    var adminClickTimer = null;
 
     function saveData() { localStorage.setItem('bubbleStreetMenu', JSON.stringify(appData)); }
     function loadData() {
-        const saved = localStorage.getItem('bubbleStreetMenu');
-        appData = (saved && JSON.parse(saved).recipes && Object.keys(JSON.parse(saved).recipes).length > 0) ? JSON.parse(saved) : JSON.parse(JSON.stringify(initialData));
+        var saved = localStorage.getItem('bubbleStreetMenu');
+        var parsedSaved = saved ? JSON.parse(saved) : null;
+        appData = (parsedSaved && parsedSaved.recipes && Object.keys(parsedSaved.recipes).length > 0) ? parsedSaved : JSON.parse(JSON.stringify(initialData));
     }
     
     function renderLists() {
-        const drinksList = document.getElementById('drinks-list');
-        const prepsList = document.getElementById('preps-list');
+        var drinksList = document.getElementById('drinks-list');
+        var prepsList = document.getElementById('preps-list');
         drinksList.innerHTML = '';
         prepsList.innerHTML = '';
         
-        Object.keys(appData.recipes).sort((a,b) => appData.recipes[a].name.localeCompare(appData.recipes[b].name)).forEach(key => {
-            const link = document.createElement('a');
+        Object.keys(appData.recipes).sort(function(a,b) { return appData.recipes[a].name.localeCompare(appData.recipes[b].name) }).forEach(function(key) {
+            var link = document.createElement('a');
             link.href = '#';
             link.textContent = appData.recipes[key].name;
             link.dataset.key = key;
             link.dataset.type = 'recipe';
             if (key === activeKey && activeTab === 'drinks') link.classList.add('active');
-            const item = document.createElement('li');
+            var item = document.createElement('li');
             item.appendChild(link);
             drinksList.appendChild(item);
         });
 
-        Object.keys(appData.preparations).sort((a,b) => appData.preparations[a].name.localeCompare(appData.preparations[b].name)).forEach(key => {
-            const link = document.createElement('a');
+        Object.keys(appData.preparations).sort(function(a,b) { return appData.preparations[a].name.localeCompare(appData.preparations[b].name) }).forEach(function(key) {
+            var link = document.createElement('a');
             link.href = '#';
             link.textContent = appData.preparations[key].name;
             link.dataset.key = key;
             link.dataset.type = 'prep';
             if (key === activeKey && activeTab === 'preps') link.classList.add('active');
-            const item = document.createElement('li');
+            var item = document.createElement('li');
             item.appendChild(link);
             prepsList.appendChild(item);
         });
@@ -1285,143 +451,196 @@ const initialData = {
     
     function renderContent(type, key) {
         activeKey = key;
-        const output = document.getElementById('content-output');
+        var output = document.getElementById('content-output');
         if (type === 'recipe') {
-            selectedVolume = null;
-            const recipe = appData.recipes[key];
-            const detailsHtml = `
-                <div class="volume-selector">
-                    <h1>${recipe.name}</h1>
-                    <p style="font-size: 1.2em; color: #555;">Выберите объем:</p>
-                    <div class="volume-selector-buttons">
-                        <button class="volume-btn" onclick="renderRecipeForVolume('${key}', '500')">500 мл</button>
-                        <button class="volume-btn" onclick="renderRecipeForVolume('${key}', '650')">650 мл</button>
-                    </div>
-                </div>`;
-            const imageHtml = recipe.imageUrl ? `<div class="recipe-image-container"><img src="${recipe.imageUrl}" alt="${recipe.name}"></div>` : '';
-            output.innerHTML = `<div class="recipe-view-container"><div class="recipe-details">${detailsHtml}</div>${imageHtml}</div>`;
-        
+            var recipe = appData.recipes[key];
+            if (recipe.volumeType === 'single') {
+                renderSingleVolumeRecipe(key);
+            } else {
+                selectedVolume = null;
+                var detailsHtml = '<div class="volume-selector">' +
+                    '<h1>' + recipe.name + '</h1>' +
+                    '<p style="font-size: 1.2em; color: #555;">Выберите объем:</p>' +
+                    '<div class="volume-selector-buttons">' +
+                        '<button class="volume-btn" onclick="renderRecipeForVolume(\'' + key + '\', \'500\')">500 мл</button>' +
+                        '<button class="volume-btn" onclick="renderRecipeForVolume(\'' + key + '\', \'650\')">650 мл</button>' +
+                    '</div>' +
+                '</div>';
+                var imageHtml = recipe.imageUrl ? '<div class="recipe-image-container"><img src="' + recipe.imageUrl + '" alt="' + recipe.name + '"></div>' : '';
+                output.innerHTML = '<div class="recipe-view-container"><div class="recipe-details">' + detailsHtml + '</div>' + imageHtml + '</div>';
+            }
         } else if (type === 'prep') {
-            const prep = appData.preparations[key];
-            output.innerHTML = `
-                <div class="recipe-header"><h1>${prep.name}</h1>
-                    <div class="edit-controls admin-only"><button class="btn" onclick="renderPrepEdit('${key}')">Редактировать</button></div>
-                </div>
-                <div style="font-size: 1.2em; line-height: 1.6;">${prep.description.replace(/\n/g, '<br>')}</div>`;
+            var prep = appData.preparations[key];
+            output.innerHTML = '<div class="recipe-header"><h1>' + prep.name + '</h1>' +
+                    '<div class="edit-controls admin-only"><button class="btn" onclick="renderPrepEdit(\'' + key + '\')">Редактировать</button></div>' +
+                '</div>' +
+                '<div style="font-size: 1.2em; line-height: 1.6;">' + prep.description.replace(/\n/g, '<br>') + '</div>';
         }
         renderLists();
     }
 
-    function renderRecipeForVolume(key, volume) {
-        selectedVolume = volume;
-        const recipe = appData.recipes[key];
-        const output = document.getElementById('content-output');
-
-        const stepsHtml = recipe.steps.map(step => {
-            let ingredientsTableHtml = '';
-            if (step.ingredientKeys?.length > 0) {
-                const rows = step.ingredientKeys.map(ingKey => {
-                    const ingData = recipe.allIngredients[ingKey];
-                    const amount = ingData ? (ingData['size' + volume] || '') : '';
-                    return ingData ? `<tr><td>${ingData.name}</td><td>${amount}</td></tr>` : '';
+    function renderSingleVolumeRecipe(key) {
+        var recipe = appData.recipes[key];
+        var output = document.getElementById('content-output');
+        
+        var stepsHtml = recipe.steps.map(function(step) {
+            var ingredientsTableHtml = '';
+            if (step.ingredientKeys && step.ingredientKeys.length > 0) {
+                var rows = step.ingredientKeys.map(function(ingKey) {
+                    var ingData = recipe.allIngredients[ingKey];
+                    var amount = ingData ? (ingData.quantity || '') : '';
+                    return ingData ? '<tr><td>' + ingData.name + '</td><td>' + amount + '</td></tr>' : '';
                 }).join('');
-                ingredientsTableHtml = `<table class="step-ingredients-table"><thead><tr><th>Ингредиент</th><th>Вес в гр (на ${volume}мл)</th></tr></thead><tbody>${rows}</tbody></table>`;
+                ingredientsTableHtml = '<table class="step-ingredients-table"><thead><tr><th>Ингредиент</th><th>Количество ('+ recipe.volume +')</th></tr></thead><tbody>' + rows + '</tbody></table>';
             }
-            return `<li><div class="step-wrapper"><div class="step-description">${step.description}</div>${ingredientsTableHtml}</div></li>`;
+            return '<li><div class="step-wrapper"><div class="step-description">' + step.description + '</div>' + ingredientsTableHtml + '</div></li>';
         }).join('');
 
-        const detailsHtml = `
-            <div class="recipe-header"><h1>${recipe.name}</h1><div class="edit-controls admin-only"><button class="btn" onclick="renderRecipeEdit('${key}')">Редактировать</button></div></div>
-            <div class="volume-toggle">
-                <button class="toggle-btn ${volume === '500' ? 'active' : ''}" onclick="renderRecipeForVolume('${key}', '500')">500 мл</button>
-                <button class="toggle-btn ${volume === '650' ? 'active' : ''}" onclick="renderRecipeForVolume('${key}', '650')">650 мл</button>
-            </div>
-            <ol class="steps-list">${stepsHtml}</ol>
-        `;
-        const imageHtml = recipe.imageUrl ? `<div class="recipe-image-container"><img src="${recipe.imageUrl}" alt="${recipe.name}"></div>` : '';
+        var detailsHtml = '<div class="recipe-header"><h1>' + recipe.name + ' (' + recipe.volume + ')</h1><div class="edit-controls admin-only"><button class="btn" onclick="renderRecipeEdit(\'' + key + '\')">Редактировать</button></div></div>' +
+            '<ol class="steps-list">' + stepsHtml + '</ol>';
+        var imageHtml = recipe.imageUrl ? '<div class="recipe-image-container"><img src="' + recipe.imageUrl + '" alt="' + recipe.name + '"></div>' : '';
         
-        output.innerHTML = `<div class="recipe-view-container"><div class="recipe-details">${detailsHtml}</div>${imageHtml}</div>`;
+        output.innerHTML = '<div class="recipe-view-container"><div class="recipe-details">' + detailsHtml + '</div>' + imageHtml + '</div>';
+    }
+
+    function renderRecipeForVolume(key, volume) {
+        selectedVolume = volume;
+        var recipe = appData.recipes[key];
+        var output = document.getElementById('content-output');
+
+        var stepsHtml = recipe.steps.map(function(step) {
+            var ingredientsTableHtml = '';
+            if (step.ingredientKeys && step.ingredientKeys.length > 0) {
+                var rows = step.ingredientKeys.map(function(ingKey) {
+                    var ingData = recipe.allIngredients[ingKey];
+                    var amount = ingData ? (ingData['size' + volume] || '') : '';
+                    return ingData ? '<tr><td>' + ingData.name + '</td><td>' + amount + '</td></tr>' : '';
+                }).join('');
+                ingredientsTableHtml = '<table class="step-ingredients-table"><thead><tr><th>Ингредиент</th><th>Кол-во (' + volume + 'мл)</th></tr></thead><tbody>' + rows + '</tbody></table>';
+            }
+            return '<li><div class="step-wrapper"><div class="step-description">' + step.description + '</div>' + ingredientsTableHtml + '</div></li>';
+        }).join('');
+
+        var detailsHtml = '<div class="recipe-header"><h1>' + recipe.name + '</h1><div class="edit-controls admin-only"><button class="btn" onclick="renderRecipeEdit(\'' + key + '\')">Редактировать</button></div></div>' +
+            '<div class="volume-toggle">' +
+                '<button class="toggle-btn ' + (volume === '500' ? 'active' : '') + '" onclick="renderRecipeForVolume(\'' + key + '\', \'500\')">500 мл</button>' +
+                '<button class="toggle-btn ' + (volume === '650' ? 'active' : '') + '" onclick="renderRecipeForVolume(\'' + key + '\', \'650\')">650 мл</button>' +
+            '</div>' +
+            '<ol class="steps-list">' + stepsHtml + '</ol>';
+        var imageHtml = recipe.imageUrl ? '<div class="recipe-image-container"><img src="' + recipe.imageUrl + '" alt="' + recipe.name + '"></div>' : '';
+        
+        output.innerHTML = '<div class="recipe-view-container"><div class="recipe-details">' + detailsHtml + '</div>' + imageHtml + '</div>';
     }
     
     function renderRecipeEdit(key) {
         destroySortables();
-        const recipe = appData.recipes[key];
-        const output = document.getElementById('content-output');
-        let stepsHtml = recipe.steps.map((step, stepIndex) => renderEditStep(key, step, stepIndex)).join('');
-        output.innerHTML = `
-            <div class="edit-form">
-                <h2>Редактирование "${recipe.name}"</h2>
-                <label>Название напитка:</label><input type="text" id="edit-recipe-name" value="${recipe.name}">
-                <label>Ссылка на изображение (с GitHub):</label><input type="text" id="edit-image-url" value="${recipe.imageUrl || ''}">
-                <div id="edit-steps-container">${stepsHtml}</div>
-                <button onclick="addStep('${key}')">+ Добавить шаг</button><hr style="margin: 20px 0;">
-                <div class="edit-controls">
-                     <button class="btn-primary" onclick="saveRecipeEdit('${key}')">Сохранить</button>
-                     <button class="btn" onclick="renderContent('recipe', '${key}')">Отмена</button>
-                     <button class="btn-danger" style="float: right;" onclick="deleteItem('recipe', '${key}')">Удалить</button>
-                </div>
-            </div>`;
+        var recipe = appData.recipes[key];
+        var output = document.getElementById('content-output');
+        var stepsHtml = recipe.steps.map(function(step, stepIndex) {
+            return renderEditStep(key, step, stepIndex);
+        }).join('');
+        output.innerHTML = '<div class="edit-form">' +
+            '<h2>Редактирование "' + recipe.name + '"</h2>' +
+            '<label>Название напитка:</label><input type="text" id="edit-recipe-name" value="' + recipe.name + '">' +
+            '<label>Ссылка на изображение (с GitHub):</label><input type="text" id="edit-image-url" value="' + (recipe.imageUrl || '') + '">' +
+            (recipe.volumeType === 'single' ? '<label>Объем (например, 500 мл):</label><input type="text" id="edit-recipe-volume" value="' + (recipe.volume || '') + '">' : '') +
+            '<div id="edit-steps-container">' + stepsHtml + '</div>' +
+            '<button onclick="addStep(\'' + key + '\')">+ Добавить шаг</button><hr style="margin: 20px 0;">' +
+            '<div class="edit-controls">' +
+                 '<button class="btn-primary" onclick="saveRecipeEdit(\'' + key + '\')">Сохранить</button>' +
+                 '<button class="btn" onclick="renderContent(\'recipe\', \'' + key + '\')">Отмена</button>' +
+                 '<button class="btn-danger" style="float: right;" onclick="deleteItem(\'recipe\', \'' + key + '\')">Удалить</button>' +
+            '</div>' +
+        '</div>';
         initSortables(key);
     }
     
     function renderPrepEdit(key) {
-        const prep = appData.preparations[key];
-        const output = document.getElementById('content-output');
-        output.innerHTML = `
-            <div class="edit-form">
-                <h2>Редактирование "${prep.name}"</h2>
-                <label>Название заготовки:</label><input type="text" id="edit-prep-name" value="${prep.name}">
-                <label>Описание / Рецепт:</label><textarea id="edit-prep-desc" rows="6">${prep.description}</textarea>
-                <hr style="margin: 20px 0;">
-                <div class="edit-controls">
-                     <button class="btn-primary" onclick="savePrepEdit('${key}')">Сохранить</button>
-                     <button class="btn" onclick="renderContent('prep', '${key}')">Отмена</button>
-                     <button class="btn-danger" style="float: right;" onclick="deleteItem('prep', '${key}')">Удалить</button>
-                </div>
-            </div>`;
+        var prep = appData.preparations[key];
+        var output = document.getElementById('content-output');
+        output.innerHTML = '<div class="edit-form">' +
+            '<h2>Редактирование "' + prep.name + '"</h2>' +
+            '<label>Название заготовки:</label><input type="text" id="edit-prep-name" value="' + prep.name + '">' +
+            '<label>Описание / Рецепт:</label><textarea id="edit-prep-desc" rows="6">' + prep.description + '</textarea>' +
+            '<hr style="margin: 20px 0;">' +
+            '<div class="edit-controls">' +
+                 '<button class="btn-primary" onclick="savePrepEdit(\'' + key + '\')">Сохранить</button>' +
+                 '<button class="btn" onclick="renderContent(\'prep\', \'' + key + '\')">Отмена</button>' +
+                 '<button class="btn-danger" style="float: right;" onclick="deleteItem(\'prep\', \'' + key + '\')">Удалить</button>' +
+            '</div>' +
+        '</div>';
     }
     
     function renderEditStep(key, step, stepIndex) {
-        let ingredientsHtml = step.ingredientKeys.map(ingKey => {
-             const ingData = appData.recipes[key].allIngredients[ingKey];
+        var recipe = appData.recipes[key];
+        var isSingle = recipe.volumeType === 'single';
+
+        var ingredientsHtml = step.ingredientKeys.map(function(ingKey) {
+             var ingData = recipe.allIngredients[ingKey];
              if(!ingData) return '';
-             return `<div class="edit-ingredient" data-ing-key="${ingKey}">
-                        <input type="text" value="${ingData.name}" placeholder="Название">
-                        <input type="text" value="${ingData.size500}" placeholder="500мл">
-                        <input type="text" value="${ingData.size650}" placeholder="650мл">
-                        <button onclick="removeIngredientFromStep(this)">&times;</button>
-                    </div>`;
+             if(isSingle) {
+                return '<div class="edit-ingredient edit-ingredient-single" data-ing-key="' + ingKey + '">' +
+                    '<input type="text" value="' + ingData.name + '" placeholder="Название">' +
+                    '<input type="text" value="' + ingData.quantity + '" placeholder="Кол-во">' +
+                    '<button onclick="removeIngredientFromStep(this)">&times;</button>' +
+                '</div>';
+             } else {
+                return '<div class="edit-ingredient" data-ing-key="' + ingKey + '">' +
+                    '<input type="text" value="' + ingData.name + '" placeholder="Название">' +
+                    '<input type="text" value="' + ingData.size500 + '" placeholder="500мл">' +
+                    '<input type="text" value="' + ingData.size650 + '" placeholder="650мл">' +
+                    '<button onclick="removeIngredientFromStep(this)">&times;</button>' +
+                '</div>';
+             }
         }).join('');
-        return `<div class="edit-step" data-step-index="${stepIndex}">
-                    <h4>Шаг ${stepIndex + 1}</h4>
-                    <textarea rows="2" placeholder="Описание шага">${step.description}</textarea>
-                    <div class="edit-ingredient-header"><span>Ингредиент</span><span>500мл</span><span>650мл</span></div>
-                    <div class="edit-ingredient-container">${ingredientsHtml}</div>
-                    <button onclick="addIngredientToStep(this)">+ Ингредиент</button>
-                    <button class="btn-danger" onclick="removeStep(this)">Удалить шаг</button>
-                </div>`;
+
+        var headerHtml = isSingle 
+            ? '<div class="edit-ingredient-header edit-ingredient-header-single"><span>Ингредиент</span><span>Количество</span></div>'
+            : '<div class="edit-ingredient-header"><span>Ингредиент</span><span>500мл</span><span>650мл</span></div>';
+
+        return '<div class="edit-step" data-step-index="' + stepIndex + '">' +
+            '<h4>Шаг ' + (stepIndex + 1) + '</h4>' +
+            '<textarea rows="2" placeholder="Описание шага">' + step.description + '</textarea>' +
+            headerHtml +
+            '<div class="edit-ingredient-container">' + ingredientsHtml + '</div>' +
+            '<button onclick="addIngredientToStep(this, \''+ recipe.volumeType +'\')">+ Ингредиент</button>' +
+            '<button class="btn-danger" onclick="removeStep(this)">Удалить шаг</button>' +
+        '</div>';
     }
 
     function saveRecipeEdit(key) {
-        const newName = document.getElementById('edit-recipe-name').value.trim();
+        var newName = document.getElementById('edit-recipe-name').value.trim();
         if (!newName) { alert('Название напитка не может быть пустым.'); return; }
         
-        const editedRecipe = { 
+        var recipe = appData.recipes[key];
+        var isSingle = recipe.volumeType === 'single';
+
+        var editedRecipe = { 
             name: newName, 
+            volumeType: recipe.volumeType,
             imageUrl: document.getElementById('edit-image-url').value.trim(), 
             allIngredients: {}, 
             steps: [] 
         };
         
-        document.querySelectorAll('#edit-steps-container .edit-step').forEach(stepEl => {
-            const description = stepEl.querySelector('textarea').value;
-            const newStep = { description: description, ingredientKeys: [] };
-            stepEl.querySelectorAll('.edit-ingredient').forEach(ingEl => {
-                const ingKey = ingEl.dataset.ingKey;
-                const inputs = ingEl.querySelectorAll('input');
-                const ingName = inputs[0].value.trim();
+        if (isSingle) {
+            editedRecipe.volume = document.getElementById('edit-recipe-volume').value;
+        }
+        
+        document.querySelectorAll('#edit-steps-container .edit-step').forEach(function(stepEl) {
+            var description = stepEl.querySelector('textarea').value;
+            var newStep = { description: description, ingredientKeys: [] };
+            stepEl.querySelectorAll('.edit-ingredient, .edit-ingredient-single').forEach(function(ingEl) {
+                var ingKey = ingEl.dataset.ingKey;
+                var inputs = ingEl.querySelectorAll('input');
+                var ingName = inputs[0].value.trim();
                 if (!ingName) return;
-                editedRecipe.allIngredients[ingKey] = { name: ingName, size500: inputs[1].value, size650: inputs[2].value };
+                
+                if (isSingle) {
+                    editedRecipe.allIngredients[ingKey] = { name: ingName, quantity: inputs[1].value };
+                } else {
+                    editedRecipe.allIngredients[ingKey] = { name: ingName, size500: inputs[1].value, size650: inputs[2].value };
+                }
                 newStep.ingredientKeys.push(ingKey);
             });
             editedRecipe.steps.push(newStep);
@@ -1429,11 +648,16 @@ const initialData = {
 
         appData.recipes[key] = editedRecipe;
         saveData();
-        renderRecipeForVolume(key, selectedVolume || '500');
+
+        if (isSingle) {
+            renderSingleVolumeRecipe(key);
+        } else {
+            renderRecipeForVolume(key, selectedVolume || '500');
+        }
     }
 
     function savePrepEdit(key) {
-        const newName = document.getElementById('edit-prep-name').value.trim();
+        var newName = document.getElementById('edit-prep-name').value.trim();
         if (!newName) { alert('Название заготовки не может быть пустым.'); return; }
         appData.preparations[key] = { name: newName, description: document.getElementById('edit-prep-desc').value };
         saveData();
@@ -1441,53 +665,56 @@ const initialData = {
     }
     
     function deleteItem(type, key) {
-        const collection = type === 'recipe' ? appData.recipes : appData.preparations;
-        const name = collection[key].name;
-        if (confirm(`Вы уверены, что хотите удалить "${name}"?`)) {
+        var collection = type === 'recipe' ? appData.recipes : appData.preparations;
+        var name = collection[key].name;
+        if (confirm('Вы уверены, что хотите удалить "' + name + '"?')) {
             delete collection[key];
             saveData();
             activeKey = null;
-            document.getElementById('content-output').innerHTML = `<div class="content-placeholder"><p>Элемент удален.</p></div>`;
+            document.getElementById('content-output').innerHTML = '<div class="content-placeholder"><p>Элемент удален.</p></div>';
             renderLists();
         }
     }
     
     function addStep(key) {
-        const newStep = { description: 'Новый шаг', ingredientKeys: [] };
-        appData.recipes[key].steps.push(newStep);
-        const container = document.getElementById('edit-steps-container');
-        container.insertAdjacentHTML('beforeend', renderEditStep(key, newStep, appData.recipes[key].steps.length - 1));
-        initSortables(key);
+        appData.recipes[key].steps.push({ description: 'Новый шаг', ingredientKeys: [] });
+        renderRecipeEdit(key);
     }
     function removeStep(element) { element.closest('.edit-step').remove(); }
-    function addIngredientToStep(element) {
-        const container = element.previousElementSibling;
-        const newIngKey = 'ing_' + Date.now();
-        const newIngDiv = document.createElement('div');
-        newIngDiv.className = 'edit-ingredient';
+    function addIngredientToStep(element, volumeType) {
+        var container = element.previousElementSibling;
+        var newIngKey = 'ing_' + Date.now();
+        var newIngDiv = document.createElement('div');
+        
+        if (volumeType === 'single') {
+            newIngDiv.className = 'edit-ingredient edit-ingredient-single';
+            newIngDiv.innerHTML = '<input type="text" placeholder="Название"><input type="text" placeholder="Кол-во"><button onclick="removeIngredientFromStep(this)">&times;</button>';
+        } else {
+            newIngDiv.className = 'edit-ingredient';
+            newIngDiv.innerHTML = '<input type="text" placeholder="Название"><input type="text" placeholder="500мл"><input type="text" placeholder="650мл"><button onclick="removeIngredientFromStep(this)">&times;</button>';
+        }
         newIngDiv.dataset.ingKey = newIngKey;
-        newIngDiv.innerHTML = `<input type="text" placeholder="Название"><input type="text" placeholder="500мл"><input type="text" placeholder="650мл"><button onclick="removeIngredientFromStep(this)">&times;</button>`;
         container.appendChild(newIngDiv);
     }
-    function removeIngredientFromStep(element) { element.closest('.edit-ingredient').remove(); }
+    function removeIngredientFromStep(element) { element.closest('.edit-ingredient, .edit-ingredient-single').remove(); }
     
     function initSortables() {
         destroySortables();
-        const stepsContainer = document.getElementById('edit-steps-container');
+        var stepsContainer = document.getElementById('edit-steps-container');
         if (stepsContainer) {
             sortableInstances.push(new Sortable(stepsContainer, { animation: 150, handle: 'h4', ghostClass: 'sortable-ghost' }));
         }
-        document.querySelectorAll('.edit-ingredient-container').forEach(container => {
+        document.querySelectorAll('.edit-ingredient-container').forEach(function(container) {
             sortableInstances.push(new Sortable(container, { animation: 150, ghostClass: 'sortable-ghost' }));
         });
     }
     function destroySortables() {
-        sortableInstances.forEach(s => s.destroy());
+        sortableInstances.forEach(function(s) { s.destroy(); });
         sortableInstances = [];
     }
 
     function showExportModal() {
-        const dataString = `const initialData = ${JSON.stringify(appData, null, 4)};`;
+        var dataString = 'var initialData = ' + JSON.stringify(appData, null, 4) + ';';
         document.getElementById('export-textarea').value = dataString;
         document.getElementById('export-modal').style.display = 'flex';
     }
@@ -1502,7 +729,7 @@ const initialData = {
         alert('Режим администратора активирован!');
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', function() {
         if (sessionStorage.getItem('adminMode') === 'true') {
             document.body.classList.add('admin-mode-active');
         }
@@ -1510,19 +737,19 @@ const initialData = {
         loadData();
         renderLists();
         
-        document.getElementById('menu-title-trigger').addEventListener('click', () => {
+        document.getElementById('menu-title-trigger').addEventListener('click', function() {
             clearTimeout(adminClickTimer);
             adminClickCount++;
             if (adminClickCount === 5) {
                 enableAdminMode();
                 adminClickCount = 0;
             }
-            adminClickTimer = setTimeout(() => { adminClickCount = 0; }, 1500);
+            adminClickTimer = setTimeout(function() { adminClickCount = 0; }, 1500);
         });
         
-        document.querySelector('.sidebar-tabs').addEventListener('click', e => {
+        document.querySelector('.sidebar-tabs').addEventListener('click', function(e) {
             if (e.target.tagName !== 'BUTTON') return;
-            const newTab = e.target.id === 'tab-drinks' ? 'drinks' : 'preps';
+            var newTab = e.target.id === 'tab-drinks' ? 'drinks' : 'preps';
             if (newTab === activeTab) return;
             activeTab = newTab;
             
@@ -1533,22 +760,30 @@ const initialData = {
             document.getElementById('new-item-btn').textContent = activeTab === 'drinks' ? 'Создать новый напиток' : 'Создать заготовку';
             
             activeKey = null;
-            document.getElementById('content-output').innerHTML = `<div class="content-placeholder"><p>← Выберите элемент из меню</p></div>`;
+            document.getElementById('content-output').innerHTML = '<div class="content-placeholder"><p>← Выберите элемент из меню</p></div>';
             renderLists();
         });
         
-        document.querySelector('.sidebar-content').addEventListener('click', e => {
-            const link = e.target.closest('a');
+        document.querySelector('.sidebar-content').addEventListener('click', function(e) {
+            var link = e.target.closest('a');
             if (link) {
                 e.preventDefault();
                 renderContent(link.dataset.type, link.dataset.key);
             }
         });
         
-        document.getElementById('new-item-btn').addEventListener('click', () => {
-            const key = (activeTab === 'drinks' ? 'recipe_' : 'prep_') + Date.now();
+        document.getElementById('new-item-btn').addEventListener('click', function() {
+            var key = (activeTab === 'drinks' ? 'recipe_' : 'prep_') + Date.now();
             if (activeTab === 'drinks') {
-                appData.recipes[key] = { name: 'Новый напиток', imageUrl: '', allIngredients: {}, steps: [{ description: 'Первый шаг', ingredientKeys: [] }] };
+                var newRecipeType = prompt('Введите тип напитка: "dual" для двух объемов или "single" для одного.', 'dual');
+                if (newRecipeType !== 'dual' && newRecipeType !== 'single') {
+                    alert('Неверный тип. Попробуйте еще раз.');
+                    return;
+                }
+                appData.recipes[key] = { name: 'Новый напиток', volumeType: newRecipeType, imageUrl: '', allIngredients: {}, steps: [{ description: 'Первый шаг', ingredientKeys: [] }] };
+                if (newRecipeType === 'single') {
+                    appData.recipes[key].volume = '500 мл';
+                }
                 renderRecipeEdit(key);
             } else {
                 appData.preparations[key] = { name: 'Новая заготовка', description: '' };
@@ -1560,16 +795,17 @@ const initialData = {
 
         document.getElementById('export-btn').addEventListener('click', showExportModal);
         document.getElementById('export-modal-close').addEventListener('click', closeExportModal);
-        document.getElementById('export-modal').addEventListener('click', e => {
+        document.getElementById('export-modal').addEventListener('click', function(e) {
             if (e.target === e.currentTarget) closeExportModal();
         });
-        document.getElementById('copy-code-btn').addEventListener('click', () => {
-            const textarea = document.getElementById('export-textarea');
+        document.getElementById('copy-code-btn').addEventListener('click', function() {
+            var textarea = document.getElementById('export-textarea');
             textarea.select();
-            textarea.setSelectionRange(0, 99999); // For mobile devices
+            textarea.setSelectionRange(0, 99999);
             try {
-                document.execCommand('copy');
-                alert('Код скопирован в буфер обмена!');
+                var successful = document.execCommand('copy');
+                var msg = successful ? 'Код скопирован в буфер обмена!' : 'Не удалось скопировать код.';
+                alert(msg);
             } catch (err) {
                 alert('Не удалось скопировать код. Пожалуйста, сделайте это вручную.');
             }
