@@ -23,12 +23,11 @@
         .content { flex-grow: 1; padding: 10px 15px; overflow-y: auto; }
         .content-placeholder { display: flex; justify-content: center; align-items: center; height: 100%; color: #888; font-size: 1.2em; text-align: center; }
 
-        /* --- НОВАЯ УНИВЕРСАЛЬНАЯ ЛОГИКА ОТОБРАЖЕНИЯ --- */
-        /* По умолчанию (для телефонов) - одна колонка, картинка внизу */
+        /* По умолчанию (для телефонов и планшетов в портретной ориентации) */
         .recipe-view-container { display: flex; flex-direction: column; }
-        .recipe-image-container { order: 2; /* Ставит картинку вниз */ margin-top: 20px; }
+        .recipe-image-container { order: 2; margin-top: 20px; }
         .recipe-image-container img { width: 100%; height: auto; border-radius: 8px; object-fit: contain; }
-        .recipe-details { order: 1; /* Ставит рецепт наверх */ }
+        .recipe-details { order: 1; }
         
         .recipe-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
         h1 { margin: 0; font-size: 1.6em; }
@@ -71,8 +70,10 @@
         body.admin-mode-active .admin-only { display: flex !important; }
         body.admin-mode-active .sidebar-footer { display: flex !important; }
         
-        /* Медиа-запрос для планшетов в горизонтальной ориентации и ПК */
-        @media (min-width: 992px) {
+        /* --- ИСПРАВЛЕННЫЙ МЕДИА-ЗАПРОС ДЛЯ ПЛАНШЕТОВ И ПК --- */
+        @media (min-width: 800px) {
+            .app-container { flex-direction: row; }
+            .sidebar { width: 260px; height: 100vh; }
             .recipe-view-container { flex-direction: row; gap: 20px; }
             .recipe-details { flex: 2.5; order: 1; }
             .recipe-image-container { display: block; flex: 1; position: sticky; top: 15px; order: 2; margin-top: 0; }
@@ -80,7 +81,7 @@
         }
         
         /* Медиа-запрос для телефонов */
-        @media (max-width: 768px) {
+        @media (max-width: 799px) {
             .app-container { flex-direction: column; height: auto; }
             .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #ddd; max-height: 40vh; }
             .content { padding: 10px; }
