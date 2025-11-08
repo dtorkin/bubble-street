@@ -449,8 +449,8 @@ var initialData = {
             var link = document.createElement('a');
             link.href = '#';
             link.textContent = appData.recipes[key].name;
-            link.dataset.key = key;
-            link.dataset.type = 'recipe';
+            link.setAttribute('data-key', key);
+            link.setAttribute('data-type', 'recipe');
             if (key === activeKey && activeTab === 'drinks') link.classList.add('active');
             var item = document.createElement('li');
             item.appendChild(link);
@@ -461,8 +461,8 @@ var initialData = {
             var link = document.createElement('a');
             link.href = '#';
             link.textContent = appData.preparations[key].name;
-            link.dataset.key = key;
-            link.dataset.type = 'prep';
+            link.setAttribute('data-key', key);
+            link.setAttribute('data-type', 'prep');
             if (key === activeKey && activeTab === 'preps') link.classList.add('active');
             var item = document.createElement('li');
             item.appendChild(link);
@@ -648,14 +648,19 @@ var initialData = {
             editedRecipe.volume = document.getElementById('edit-recipe-volume').value;
         }
         
-        document.querySelectorAll('#edit-steps-container .edit-step').forEach(function(stepEl) {
+        var stepElements = document.querySelectorAll('#edit-steps-container .edit-step');
+        for(var i = 0; i < stepElements.length; i++){
+            var stepEl = stepElements[i];
             var description = stepEl.querySelector('textarea').value;
             var newStep = { description: description, ingredientKeys: [] };
-            stepEl.querySelectorAll('.edit-ingredient, .edit-ingredient-single').forEach(function(ingEl) {
-                var ingKey = ingEl.dataset.ingKey;
+            
+            var ingElements = stepEl.querySelectorAll('.edit-ingredient, .edit-ingredient-single');
+            for(var j = 0; j < ingElements.length; j++){
+                var ingEl = ingElements[j];
+                var ingKey = ingEl.getAttribute('data-ing-key');
                 var inputs = ingEl.querySelectorAll('input');
                 var ingName = inputs[0].value.trim();
-                if (!ingName) return;
+                if (!ingName) continue;
                 
                 if (isSingle) {
                     editedRecipe.allIngredients[ingKey] = { name: ingName, quantity: inputs[1].value };
@@ -663,9 +668,9 @@ var initialData = {
                     editedRecipe.allIngredients[ingKey] = { name: ingName, size500: inputs[1].value, size650: inputs[2].value };
                 }
                 newStep.ingredientKeys.push(ingKey);
-            });
+            }
             editedRecipe.steps.push(newStep);
-        });
+        }
 
         appData.recipes[key] = editedRecipe;
         saveData();
@@ -698,10 +703,19 @@ var initialData = {
     }
     
     function addStep(key) {
-        appData.recipes[key].steps.push({ description: 'Новый шаг', ingredientKeys: [] });
-        renderRecipeEdit(key);
+        var newStep = { description: 'Новый шаг', ingredientKeys: [] };
+        appData.recipes[key].steps.push(newStep);
+        var container = document.getElementById('edit-steps-container');
+        container.insertAdjacentHTML('beforeend', renderEditStep(key, newStep, appData.recipes[key].steps.length - 1));
+        initSortables(key);
     }
-    function removeStep(element) { element.closest('.edit-step').remove(); }
+    function removeStep(element) {
+        var stepEl = element;
+        while(stepEl && !stepEl.classList.contains('edit-step')) {
+            stepEl = stepEl.parentNode;
+        }
+        if(stepEl) stepEl.parentNode.removeChild(stepEl);
+    }
     function addIngredientToStep(element, volumeType) {
         var container = element.previousElementSibling;
         var newIngKey = 'ing_' + Date.now();
@@ -714,10 +728,16 @@ var initialData = {
             newIngDiv.className = 'edit-ingredient';
             newIngDiv.innerHTML = '<input type="text" placeholder="Название"><input type="text" placeholder="500мл"><input type="text" placeholder="650мл"><button onclick="removeIngredientFromStep(this)">&times;</button>';
         }
-        newIngDiv.dataset.ingKey = newIngKey;
+        newIngDiv.setAttribute('data-ing-key', newIngKey);
         container.appendChild(newIngDiv);
     }
-    function removeIngredientFromStep(element) { element.closest('.edit-ingredient, .edit-ingredient-single').remove(); }
+    function removeIngredientFromStep(element) {
+         var ingEl = element;
+        while(ingEl && !ingEl.classList.contains('edit-ingredient') && !ingEl.classList.contains('edit-ingredient-single')) {
+            ingEl = ingEl.parentNode;
+        }
+        if(ingEl) ingEl.parentNode.removeChild(ingEl);
+    }
     
     function initSortables() {
         destroySortables();
@@ -725,12 +745,15 @@ var initialData = {
         if (stepsContainer) {
             sortableInstances.push(new Sortable(stepsContainer, { animation: 150, handle: 'h4', ghostClass: 'sortable-ghost' }));
         }
-        document.querySelectorAll('.edit-ingredient-container').forEach(function(container) {
-            sortableInstances.push(new Sortable(container, { animation: 150, ghostClass: 'sortable-ghost' }));
-        });
+        var ingContainers = document.querySelectorAll('.edit-ingredient-container');
+        for(var i=0; i<ingContainers.length; i++){
+            sortableInstances.push(new Sortable(ingContainers[i], { animation: 150, ghostClass: 'sortable-ghost' }));
+        }
     }
     function destroySortables() {
-        sortableInstances.forEach(function(s) { s.destroy(); });
+        for(var i=0; i<sortableInstances.length; i++){
+            sortableInstances[i].destroy();
+        }
         sortableInstances = [];
     }
 
@@ -786,10 +809,14 @@ var initialData = {
         });
         
         document.querySelector('.sidebar-content').addEventListener('click', function(e) {
-            var link = e.target.closest('a');
-            if (link) {
-                e.preventDefault();
-                renderContent(link.dataset.type, link.dataset.key);
+            var target = e.target;
+            while(target && target !== this){
+                if(target.tagName === 'A'){
+                    e.preventDefault();
+                    renderContent(target.getAttribute('data-type'), target.getAttribute('data-key'));
+                    return;
+                }
+                target = target.parentNode;
             }
         });
         
