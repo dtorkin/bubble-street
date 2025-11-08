@@ -23,7 +23,6 @@
         .content { flex-grow: 1; padding: 10px 15px; overflow-y: auto; }
         .content-placeholder { display: flex; justify-content: center; align-items: center; height: 100%; color: #888; font-size: 1.2em; text-align: center; }
 
-        /* По умолчанию (для телефонов и планшетов в портретной ориентации) */
         .recipe-view-container { display: flex; flex-direction: column; }
         .recipe-image-container { order: 2; margin-top: 20px; }
         .recipe-image-container img { width: 100%; height: auto; border-radius: 8px; object-fit: contain; }
@@ -35,9 +34,14 @@
         .steps-list > li { counter-increment: step-counter; margin-bottom: 15px; display: flex; align-items: flex-start; }
         .steps-list > li::before { content: counter(step-counter); margin-right: 12px; background-color: #8a2be2; color: white; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; font-weight: bold; flex-shrink: 0; }
         .step-wrapper { display: flex; flex-direction: column; width: 100%; }
-        .step-description { font-weight: 500; margin-bottom: 10px; font-size: 1.1em; }
+        .step-description { font-weight: 500; margin-bottom: 8px; font-size: 1.1em; } /* Уменьшил отступ */
         .step-ingredients-table { border-collapse: collapse; width: 100%; table-layout: fixed; font-size: 1.05em; }
-        .step-ingredients-table th, .step-ingredients-table td { border: 1px solid #e0e0e0; padding: 8px 10px; text-align: left; word-wrap: break-word; }
+        .step-ingredients-table th, .step-ingredients-table td { 
+            border: 1px solid #e0e0e0; 
+            padding: 4px 8px; /* <-- ИЗМЕНЕНИЕ ЗДЕСЬ: Уменьшил вертикальные и горизонтальные отступы */
+            text-align: left; 
+            word-wrap: break-word; 
+        }
         .step-ingredients-table th { background-color: #f8f9fa; font-size: 0.9em; }
         
         .volume-selector { text-align: center; padding: 10px 0; }
@@ -70,7 +74,6 @@
         body.admin-mode-active .admin-only { display: flex !important; }
         body.admin-mode-active .sidebar-footer { display: flex !important; }
         
-        /* --- ИСПРАВЛЕННЫЙ МЕДИА-ЗАПРОС ДЛЯ ПЛАНШЕТОВ И ПК --- */
         @media (min-width: 800px) {
             .app-container { flex-direction: row; }
             .sidebar { width: 260px; height: 100vh; }
@@ -80,7 +83,6 @@
             .recipe-image-container img { max-height: 85vh; }
         }
         
-        /* Медиа-запрос для телефонов */
         @media (max-width: 799px) {
             .app-container { flex-direction: column; height: auto; }
             .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #ddd; max-height: 40vh; }
