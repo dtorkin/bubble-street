@@ -5,46 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Рецепты Bubble Street</title>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <style>
+<style>
         :root { --primary-color: #8a2be2; --light-primary-color: #eadafb; }
         body, html { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; height: 100%; background-color: #f4f4f9; }
         .app-container { display: flex; height: 100vh; flex-direction: row; }
-        .sidebar { width: 300px; background-color: #ffffff; border-right: 1px solid #ddd; display: flex; flex-direction: column; flex-shrink: 0; }
-        .sidebar-header { padding: 15px 20px; border-bottom: 1px solid #eee; cursor: pointer; }
-        .sidebar-header h2 { margin: 0; font-size: 1.2em; pointer-events: none; }
+        .sidebar { width: 260px; background-color: #ffffff; border-right: 1px solid #ddd; display: flex; flex-direction: column; flex-shrink: 0; } /* Уменьшил ширину */
+        .sidebar-header { padding: 12px 15px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .sidebar-header h2 { margin: 0; font-size: 1.1em; pointer-events: none; }
         .sidebar-tabs { display: flex; border-bottom: 1px solid #eee; }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: #f8f9fa; cursor: pointer; font-size: 1em; }
-        .tab-btn.active { background: #fff; border-bottom: 3px solid var(--primary-color); font-weight: bold; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: #f8f9fa; cursor: pointer; font-size: 1em; }
+        .tab-btn.active { background: #fff; border-bottom: 3px solid #8a2be2; font-weight: bold; }
         .sidebar-content { overflow-y: auto; flex-grow: 1; }
         .sidebar-footer { padding: 10px; border-top: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; }
         .list-container { list-style: none; padding: 0; margin: 0; }
-        .list-container a { display: block; padding: 15px 20px; color: #333; text-decoration: none; transition: background-color 0.2s; border-bottom: 1px solid #f0f0f0; }
+        .list-container a { display: block; padding: 12px 15px; color: #333; text-decoration: none; border-bottom: 1px solid #f0f0f0; }
         .list-container a:hover { background-color: #f0f0f0; }
-        .list-container a.active { background-color: var(--light-primary-color); font-weight: bold; color: var(--primary-color); }
-        .content { flex-grow: 1; padding: 25px; overflow-y: auto; }
-        .content-placeholder { display: flex; justify-content: center; align-items: center; height: 100%; color: #888; font-size: 1.5em; text-align: center; }
-        .recipe-view-container { display: flex; gap: 30px; align-items: flex-start; }
-        .recipe-details { flex: 1.5; min-width: 0; }
-        .recipe-image-container { flex: 1; min-width: 0; position: sticky; top: 25px; }
-        .recipe-image-container img { width: 100%; height: auto; border-radius: 12px; object-fit: contain; max-height: 80vh; }
-        .recipe-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
-        h1 { margin: 0; }
+        .list-container a.active { background-color: #eadafb; font-weight: bold; color: #8a2be2; }
+        .content { flex-grow: 1; padding: 10px 15px; overflow-y: auto; } /* Уменьшил поля */
+        .content-placeholder { display: flex; justify-content: center; align-items: center; height: 100%; color: #888; font-size: 1.2em; text-align: center; }
+
+        .recipe-view-container { display: flex; flex-direction: column; } /* По умолчанию одна колонка */
+        .recipe-image-container-bottom { display: block; width: 100%; margin-top: 20px; }
+        .recipe-image-container-bottom img { width: 100%; height: auto; border-radius: 8px; object-fit: contain; }
+        .recipe-image-container { display: none; } /* Боковая картинка по умолчанию скрыта */
+        
+        .recipe-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
+        h1 { margin: 0; font-size: 1.6em; }
         .steps-list { list-style-type: none; padding-left: 0; counter-reset: step-counter; }
-        .steps-list > li { counter-increment: step-counter; margin-bottom: 20px; display: flex; align-items: flex-start; }
-        .steps-list > li::before { content: counter(step-counter); margin-right: 15px; background-color: var(--primary-color); color: white; width: 35px; height: 35px; border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; font-weight: bold; flex-shrink: 0; }
+        .steps-list > li { counter-increment: step-counter; margin-bottom: 15px; display: flex; align-items: flex-start; }
+        .steps-list > li::before { content: counter(step-counter); margin-right: 12px; background-color: #8a2be2; color: white; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; font-weight: bold; flex-shrink: 0; }
         .step-wrapper { display: flex; flex-direction: column; width: 100%; }
-        .step-description { font-weight: 500; margin-bottom: 12px; font-size: 1.1em; }
-        .step-ingredients-table { border-collapse: collapse; width: 100%; table-layout: fixed; }
-        .step-ingredients-table th, .step-ingredients-table td { border: 1px solid #e0e0e0; padding: 10px 12px; text-align: left; word-wrap: break-word; }
+        .step-description { font-weight: 500; margin-bottom: 10px; font-size: 1.1em; }
+        .step-ingredients-table { border-collapse: collapse; width: 100%; table-layout: fixed; font-size: 1.05em; } /* Увеличил шрифт */
+        .step-ingredients-table th, .step-ingredients-table td { border: 1px solid #e0e0e0; padding: 8px 10px; text-align: left; word-wrap: break-word; }
         .step-ingredients-table th { background-color: #f8f9fa; font-size: 0.9em; }
-        .volume-selector { text-align: center; padding: 20px 0; }
-        .volume-selector-buttons { display: flex; gap: 20px; justify-content: center; margin-top: 20px; }
-        .volume-btn { font-size: 1.5em; padding: 20px 40px; border-radius: 10px; cursor: pointer; border: 2px solid var(--primary-color); background: #fff; color: var(--primary-color); }
-        .volume-toggle { display: flex; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 8px; overflow: hidden; }
+        
+        .volume-selector { text-align: center; padding: 10px 0; }
+        .volume-selector-buttons { display: flex; gap: 15px; justify-content: center; margin-top: 15px; }
+        .volume-btn { font-size: 1.2em; padding: 15px 25px; border-radius: 8px; cursor: pointer; border: 2px solid #8a2be2; background: #fff; color: #8a2be2; }
+        .volume-toggle { display: flex; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; overflow: hidden; }
         .toggle-btn { padding: 10px 20px; background: #f0f0f0; border: none; cursor: pointer; font-size: 1em; flex-grow: 1; }
-        .toggle-btn.active { background: var(--primary-color); color: white; }
-        .edit-controls button, .btn { padding: 8px 15px; border: 1px solid #ccc; background-color: #f0f0f0; border-radius: 5px; cursor: pointer; margin-left: 10px; }
-        .btn-primary { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .toggle-btn.active { background: #8a2be2; color: white; }
+        
+        .edit-controls button, .btn { padding: 8px 12px; border: 1px solid #ccc; background-color: #f0f0f0; border-radius: 5px; cursor: pointer; margin-left: 8px; }
+        .btn-primary { background-color: #8a2be2; color: white; border-color: #8a2be2; }
         .btn-success { background-color: #198754; color: white; border-color: #198754; }
         .btn-danger { background-color: #dc3545; color: white; border-color: #dc3545; }
         .btn-full-width { width: 100%; padding: 12px; font-size: 1.1em; margin: 0; }
@@ -53,10 +57,10 @@
         .edit-ingredient, .edit-step { cursor: grab; }
         .sortable-ghost { opacity: 0.4; background: #c8ebfb; }
         .edit-ingredient-container { display: flex; flex-direction: column; gap: 5px; }
-        .edit-ingredient { display: grid; grid-template-columns: 1fr 80px 80px auto; gap: 10px; align-items: center; }
-        .edit-ingredient-single { grid-template-columns: 1fr 120px auto; }
-        .edit-ingredient-header { display: grid; grid-template-columns: 1fr 80px 80px auto; gap: 10px; font-weight: bold; font-size: 0.9em; }
-        .edit-ingredient-header-single { grid-template-columns: 1fr 120px auto; }
+        .edit-ingredient { display: grid; grid-template-columns: 1fr 70px 70px auto; gap: 8px; align-items: center; }
+        .edit-ingredient-single { grid-template-columns: 1fr 100px auto; }
+        .edit-ingredient-header { display: grid; grid-template-columns: 1fr 70px 70px auto; gap: 8px; font-weight: bold; font-size: 0.9em; }
+        .edit-ingredient-header-single { grid-template-columns: 1fr 100px auto; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: #fff; padding: 25px; border-radius: 8px; width: 90%; max-width: 700px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px; }
@@ -66,16 +70,19 @@
         body.admin-mode-active .admin-only { display: flex !important; }
         body.admin-mode-active .sidebar-footer { display: flex !important; }
         
-        @media (max-width: 1000px) {
-            .recipe-view-container { flex-direction: column; }
-            .recipe-image-container { position: static; width: 100%; margin-top: 25px; order: 2; }
-            .recipe-details { order: 1; }
-            .recipe-image-container img { max-height: none; object-fit: contain; }
+        /* --- НОВЫЙ МЕДИА-ЗАПРОС ДЛЯ ПЛАНШЕТОВ И ПК --- */
+        @media (min-width: 992px) {
+            .recipe-view-container { flex-direction: row; gap: 20px; }
+            .recipe-details { flex: 2.5; } /* Рецепт занимает больше места */
+            .recipe-image-container { display: block; flex: 1; position: sticky; top: 15px; } /* Картинка узкая */
+            .recipe-image-container img { width: 100%; height: auto; border-radius: 8px; object-fit: contain; max-height: 85vh; }
+            .recipe-image-container-bottom { display: none; } /* Скрываем нижнюю картинку */
         }
+        
         @media (max-width: 768px) {
             .app-container { flex-direction: column; height: auto; }
             .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #ddd; max-height: 40vh; }
-            .content { padding: 15px; }
+            .content { padding: 10px; }
             .edit-ingredient { grid-template-columns: 1fr 60px 60px auto; gap: 5px; }
             .edit-ingredient-single { grid-template-columns: 1fr 80px auto; }
         }
